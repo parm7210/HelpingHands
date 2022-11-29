@@ -259,7 +259,7 @@ public class SignUpActivity extends AppCompatActivity {
                                             Map<String, Object> eContactTemplate = new HashMap<>();
                                             eContactTemplate.put("name","");
                                             eContactTemplate.put("relation","Parent");
-                                            eContactTemplate.put("contactno","");
+                                            eContactTemplate.put("contactNo","");
                                             String[] eContactList = {
                                                     "eContact1", "eContact2", "eContact3"};
                                             for (String eContact: eContactList){

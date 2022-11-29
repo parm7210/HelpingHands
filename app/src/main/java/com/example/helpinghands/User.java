@@ -43,6 +43,16 @@ public class User {
         sharedPreferences = context.getSharedPreferences("userinfo", Context.MODE_PRIVATE);
     }
 
+    public int getSOSflag() {
+        sosflag = sharedPreferences.getInt("sosflag",0);
+        return sosflag;
+    }
+
+    public void setSOSflag(int sosflag) {
+        this.sosflag = sosflag;
+        sharedPreferences.edit().putInt("sosflag",sosflag).commit();
+    }
+
     public String getPassword() {
         password = sharedPreferences.getString("password","");
         return password;
@@ -52,9 +62,6 @@ public class User {
         this.password = latitude;
         sharedPreferences.edit().putString("password",password).apply();
     }
-
-
-
 
     public int getAge() {
         age = sharedPreferences.getString("age","");
