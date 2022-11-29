@@ -176,8 +176,6 @@ public class HomeFragment extends Fragment {
             }
         });
         sosBtn.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            //Start
-
             if(isChecked){
                 if(ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.SEND_SMS) != PackageManager.PERMISSION_GRANTED){
                     Log.v(LOGNAME, "User permission not provided. Asking to grant the permission");
@@ -193,6 +191,7 @@ public class HomeFragment extends Fragment {
                         builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
+                                dialog.cancel();
                             }
                         });
                         builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
@@ -248,8 +247,6 @@ public class HomeFragment extends Fragment {
                 Toast.makeText(getActivity(),"SOS Alert is stopped",Toast.LENGTH_SHORT).show();
                 user.setSOSflag(0);
             }
-
-            //End
         });
         broadcastRequestBtn.setOnClickListener(v -> {
             Toast.makeText(

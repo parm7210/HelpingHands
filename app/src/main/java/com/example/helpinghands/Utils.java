@@ -5,6 +5,7 @@ import static android.content.Context.LOCATION_SERVICE;
 import android.Manifest;
 import android.app.Activity;
 import android.app.ActivityManager;
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.location.Address;
@@ -35,6 +36,16 @@ public class Utils {
             Log.e(TAG,"Network Error: "+e.toString());
         }
         return status;
+    }
+
+    public static void noInternetConnectionAlert(Context context){
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder.setCancelable(true);
+        builder.setTitle("No Internet Connection");
+        builder.setMessage(
+                "Internet Connection is required to perform this task.");
+        builder.setNegativeButton("Ok", (dialog, which) -> {});
+        builder.show();
     }
 
     public static LatLng locationFetch(Context context){

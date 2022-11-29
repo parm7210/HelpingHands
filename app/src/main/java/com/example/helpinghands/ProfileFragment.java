@@ -1,5 +1,8 @@
 package com.example.helpinghands;
 
+import static com.example.helpinghands.Utils.checkInternetStatus;
+import static com.example.helpinghands.Utils.noInternetConnectionAlert;
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
@@ -154,22 +157,9 @@ public class ProfileFragment extends Fragment {
     }
 
     private void deleteAccount() {
-        boolean status = false;
-        try {
-            final String command = "ping -c 1 google.com";
-            status = (Runtime.getRuntime().exec(command).waitFor() == 0);
-            Log.v("int", status + "");
-        } catch (Exception e) {
-            Log.e("status", e.toString());
-        }
 
-        if (!status) {
-            AlertDialog.Builder builder1 = new AlertDialog.Builder(activity);
-            builder1.setCancelable(true);
-            builder1.setTitle("No Internet Connection");
-            builder1.setMessage("Internet Connection is required to perform the following task.");
-            builder1.setNegativeButton("Ok", (dialog1, which1) -> {});
-            builder1.show();
+        if (!checkInternetStatus()) {
+            noInternetConnectionAlert(activity);
         }
         else{
             if(deletePass.getText().toString().equals(user.getPassword())){
@@ -205,21 +195,8 @@ public class ProfileFragment extends Fragment {
     }
 
     private void changePassword() {
-        boolean status = false;
-        try {
-            final String command = "ping -c 1 google.com";
-            status = (Runtime.getRuntime().exec(command).waitFor() == 0);
-            Log.v("int", status + "");
-        } catch (Exception e) {
-            Log.e("status", e.toString());
-        }
-        if (!status) {
-            AlertDialog.Builder builder1 = new AlertDialog.Builder(activity);
-            builder1.setCancelable(true);
-            builder1.setTitle("No Internet Connection");
-            builder1.setMessage("Internet Connection is required to perform the following task.");
-            builder1.setNegativeButton("Ok", (dialog1, which1) -> {});
-            builder1.show();
+        if (!checkInternetStatus()) {
+            noInternetConnectionAlert(activity);
         }
         else{
             if(!newPass.getText().toString().matches("[a-zA-Z0-9@#$.]{5}[a-zA-Z0-9@#$.]+")){

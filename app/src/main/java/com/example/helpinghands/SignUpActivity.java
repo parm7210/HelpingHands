@@ -1,5 +1,8 @@
 package com.example.helpinghands;
 
+import static com.example.helpinghands.Utils.checkInternetStatus;
+import static com.example.helpinghands.Utils.noInternetConnectionAlert;
+
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.AlertDialog;
@@ -197,25 +200,8 @@ public class SignUpActivity extends AppCompatActivity {
                 boolean validation = validateInputs();
                 if(validation){
 
-                    boolean status = false;
-                    try{
-                        final String command = "ping -c 1 google.com";
-                        status = (Runtime.getRuntime().exec(command).waitFor() == 0);
-                        Log.v("int",status+"");
-                    }
-                    catch (Exception e){Log.e("status",e.toString());}
-
-                    if(!status){
-                        AlertDialog.Builder builder = new AlertDialog.Builder(
-                            SignUpActivity.this);
-                        builder.setCancelable(true);
-                        builder.setTitle("No Internet Connection");
-                        builder.setMessage(
-                            "Internet Connection is required to perform the following task.");
-                        builder.setNegativeButton("Ok", (dialog, which) -> {
-                            onBackPressed();
-                        });
-                        builder.show();
+                    if(!checkInternetStatus()){
+                        noInternetConnectionAlert(SignUpActivity.this);
                     }
                     else{
                         progressBar = findViewById(R.id.progressBar);
@@ -248,7 +234,7 @@ public class SignUpActivity extends AppCompatActivity {
                             user.put("latitude",0);
                             user.put("longitude",0);
                             user.put("type", acc_type);
-                            user.put("lcity","");
+                            user.put("localeCity","");
                             db.collection("user_details")
                                     .add(user)
                                     .addOnSuccessListener((documentReference) -> {

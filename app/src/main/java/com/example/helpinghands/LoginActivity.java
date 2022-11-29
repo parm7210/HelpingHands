@@ -1,5 +1,8 @@
 package com.example.helpinghands;
 
+import static com.example.helpinghands.Utils.checkInternetStatus;
+import static com.example.helpinghands.Utils.noInternetConnectionAlert;
+
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.AlertDialog;
@@ -120,23 +123,8 @@ public class LoginActivity extends AppCompatActivity {
         loginBtn.setOnClickListener(v -> {
             if(validateInputs()) {
 
-                boolean status = false;
-                try {
-                    final String command = "ping -c 1 google.com";
-                    status = (Runtime.getRuntime().exec(command).waitFor() == 0);
-                    Log.v("int", status + "");
-                } catch (Exception e) {
-                    Log.e("status", e.toString());
-                }
-                if (!status) {
-                    AlertDialog.Builder builder = new AlertDialog.Builder(
-                        LoginActivity.this);
-                    builder.setCancelable(true);
-                    builder.setTitle("No Internet Connection");
-                    builder.setMessage(
-                        "Internet Connection is required to perform the following task.");
-                    builder.setNegativeButton("Ok", (dialog, which) -> {});
-                    builder.show();
+                if (!checkInternetStatus()) {
+                    noInternetConnectionAlert(LoginActivity.this);
                 }
                 else{
                     progressBar.setVisibility(View.VISIBLE);

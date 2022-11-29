@@ -1,5 +1,8 @@
 package com.example.helpinghands;
 
+import static com.example.helpinghands.Utils.checkInternetStatus;
+import static com.example.helpinghands.Utils.noInternetConnectionAlert;
+
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.AlertDialog;
@@ -99,22 +102,9 @@ public class EmergencyContactsActivity extends AppCompatActivity {
                 }
             }
             if(validation){
-                boolean status = false;
-                try{
-                    final String command = "ping -c 1 google.com";
-                    status = (Runtime.getRuntime().exec(command).waitFor() == 0);
-                    Log.v("int",status+"");
-                }
-                catch (Exception e){Log.e("status",e.toString());}
 
-                if(!status){
-                    AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                    builder.setCancelable(true);
-                    builder.setTitle("No Internet Connection");
-                    builder.setMessage(
-                            "Internet Connection is required to perform the following task.");
-                    builder.setNegativeButton("Ok", (dialog, which) -> onBackPressed());
-                    builder.show();
+                if(!checkInternetStatus()){
+                    noInternetConnectionAlert(this);
                 }
                 else {
 
