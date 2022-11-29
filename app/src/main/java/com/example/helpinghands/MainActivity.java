@@ -1,6 +1,5 @@
 package com.example.helpinghands;
 
-import static androidx.core.content.ContextCompat.getSystemService;
 import static com.example.helpinghands.Utils.checkInternetStatus;
 import static com.example.helpinghands.Utils.findLocality;
 import static com.example.helpinghands.Utils.isBGServiceRunning;
@@ -8,7 +7,7 @@ import static com.example.helpinghands.Utils.locationFetch;
 import static com.example.helpinghands.Utils.setUserLocation;
 import static com.example.helpinghands.Utils.updateLocality;
 
-import androidx.appcompat.app.AlertDialog;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.navigation.NavController;
@@ -17,9 +16,6 @@ import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
 import android.Manifest;
-import android.app.Activity;
-import android.app.ActivityManager;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Address;
@@ -30,11 +26,12 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.example.helpinghands.services.BGLocationUpdateService;
-import com.example.helpinghands.services.BGLocationUpdateServiceRestart;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.messaging.FirebaseMessaging;
 
 import java.util.Objects;
 
@@ -173,13 +170,22 @@ public class MainActivity extends AppCompatActivity {
 
         db = FirebaseFirestore.getInstance();
         user = new User(this);
+        FirebaseMessaging.getInstance().getToken()
+                .addOnCompleteListener(new OnCompleteListener<String>() {
+                    @Override
+                    public void onComplete(@NonNull Task<String> task) {
+                        if (!task.isSuccessful()) {
+                            Log.w(TAG, "Fetching FCM registration token failed", task.getException());
+                            return;
+                        }
+                        String token = task.getResult();
+                        Log.d(TAG, token);
+                        db.collection("user_details")
+                                .document(user.getUserid()).update("firebaseToken", token);
+                    }
+                });
         this.runOnUiThread(this::getLocation);
 
-        Log.v(TAG, "Starting background service");
-        if (!isBGServiceRunning(this, BGLocationUpdateService.class)) {
-            bgLocationServiceIntent = new Intent(this, BGLocationUpdateService.class);
-            startService(bgLocationServiceIntent);
-        }
 
     }
 

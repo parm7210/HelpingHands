@@ -79,7 +79,8 @@ public class Utils {
     public static void updateLocality(FirebaseFirestore db, User myUser,Address myAddress){
         myUser.setLocaleCity(myAddress.getLocality());
         Log.v(TAG,"Setting Locality: "+myAddress.getLocality());
-        db.collection("user_details").document(myUser.getUserid()).update("localeCity",myAddress.getLocality());
+        db.collection("user_details").document(myUser.getUserid()).update(
+                "localeCity",myAddress.getLocality());
     }
 
     static boolean isBGServiceRunning(Activity activity, Class<?> serviceClass) {
