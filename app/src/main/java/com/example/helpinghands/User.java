@@ -3,13 +3,6 @@ package com.example.helpinghands;
 import android.content.Context;
 import android.content.SharedPreferences;
 
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
-
-import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.List;
-
 
 public class User {
     Context context;
@@ -33,14 +26,14 @@ public class User {
     private Long econ3;
     private String econ3name;
     private String rel3;
-    private long contactnumber;
-    private String lname;
+    private long contactNumber;
+    private String lastName;
     private String userid;
-    private String fname;
+    private String firstName;
     private String latitude;
     private String longitude;
     private int sosflag;
-    private String lcity;
+    private String localeCity;
     private String requestorList;
     private boolean currflag;
 
@@ -49,10 +42,6 @@ public class User {
         this.context = context;
         sharedPreferences = context.getSharedPreferences("userinfo", Context.MODE_PRIVATE);
     }
-
-
-
-
 
     public String getPassword() {
         password = sharedPreferences.getString("password","");
@@ -247,14 +236,14 @@ public class User {
         sharedPreferences.edit().putString("rel3",rel3).apply();
     }
 
-    public long getContactnumber() {
-        contactnumber = sharedPreferences.getLong("contact",0);
-        return contactnumber;
+    public long getContactNumber() {
+        contactNumber = sharedPreferences.getLong("contact",0);
+        return contactNumber;
     }
 
-    public void setContactnumber(Long contactnumber) {
-        this.contactnumber = contactnumber;
-        sharedPreferences.edit().putLong("contact",contactnumber).apply();
+    public void setContactNumber(Long contactNumber) {
+        this.contactNumber = contactNumber;
+        sharedPreferences.edit().putLong("contact",contactNumber).apply();
     }
 
     public String getUserid() {
@@ -268,23 +257,53 @@ public class User {
     }
 
     public String getFName() {
-        fname = sharedPreferences.getString("userfname","");
-        return fname;
+        firstName = sharedPreferences.getString("userfname","");
+        return firstName;
     }
 
     public void setFName(String fname) {
-        this.fname = fname;
+        this.firstName = fname;
         sharedPreferences.edit().putString("userfname",fname).apply();
     }
 
     public String getLName() {
-        lname = sharedPreferences.getString("userlname","");
-        return lname;
+        lastName = sharedPreferences.getString("userlname","");
+        return lastName;
     }
 
     public void setLName(String lname) {
-        this.lname = lname;
+        this.lastName = lname;
         sharedPreferences.edit().putString("userlname",lname).apply();
+    }
+
+    public String getLatitude() {
+        latitude = sharedPreferences.getString("latitude","");
+        return latitude;
+    }
+
+    public void setLatitude(String latitude) {
+        this.latitude = latitude;
+        sharedPreferences.edit().putString("latitude",latitude).apply();
+    }
+
+    public String getLongitude() {
+        longitude = sharedPreferences.getString("longitude","");
+        return longitude;
+    }
+
+    public void setLongitude(String longitude) {
+        this.longitude = longitude;
+        sharedPreferences.edit().putString("longitude",longitude).apply();
+    }
+
+    public String getLocaleCity() {
+        localeCity = sharedPreferences.getString("localeCity","");
+        return localeCity;
+    }
+
+    public void setLocaleCity(String lcity) {
+        this.localeCity = lcity;
+        sharedPreferences.edit().putString("localeCity",lcity).apply();
     }
 
     public  void removeUser(){

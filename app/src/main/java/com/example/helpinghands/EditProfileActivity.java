@@ -3,11 +3,8 @@ package com.example.helpinghands;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
@@ -117,7 +114,7 @@ public class EditProfileActivity extends AppCompatActivity {
 
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
-        contactNo.setText(Long.toString(user.getContactnumber()));
+        contactNo.setText(Long.toString(user.getContactNumber()));
         email.setText(user.getEmail());
         age.setText(Integer.toString(user.getAge()));
         addressLine.setText(user.getAddress());

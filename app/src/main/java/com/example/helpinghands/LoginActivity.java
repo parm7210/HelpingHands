@@ -49,7 +49,7 @@ public class LoginActivity extends AppCompatActivity {
         final User user = new User(LoginActivity.this);
         user.setFName(document.get("firstName").toString());
         user.setLName(document.get("lastName").toString());
-        user.setContactnumber(Long.parseLong(document.get("contactNo").toString()));
+        user.setContactNumber(Long.parseLong(document.get("contactNo").toString()));
         user.setUserid(document.getId());
         user.setAge(Integer.parseInt(document.get("age").toString()));
         user.setAddress(document.get("address").toString());
@@ -128,7 +128,6 @@ public class LoginActivity extends AppCompatActivity {
                 } catch (Exception e) {
                     Log.e("status", e.toString());
                 }
-
                 if (!status) {
                     AlertDialog.Builder builder = new AlertDialog.Builder(
                         LoginActivity.this);

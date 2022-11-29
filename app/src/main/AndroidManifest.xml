@@ -2,6 +2,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.SEND_SMS" />
     <uses-permission android:name="android.permission.CALL_PHONE" />
 
     <application
@@ -14,6 +18,21 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.HelpingHands"
         tools:targetApi="31">
+
+        <service
+            android:name=".services.BGLocationUpdateService"
+            android:enabled="true"
+            android:process=":helping_hands_background"/>
+
+        <receiver
+            android:name=".services.BGLocationUpdateServiceRestart"
+            android:enabled="true"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="restartservice" />
+            </intent-filter>
+        </receiver>
+
         <activity
             android:name=".EmergencyContactsActivity"
             android:exported="false">

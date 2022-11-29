@@ -277,7 +277,7 @@ public class SignUpActivity extends AppCompatActivity {
                                                     SignUpActivity.this);
                                             persistentUser.setFName((String) user.get("firstName"));
                                             persistentUser.setLName((String) user.get("lastName"));
-                                            persistentUser.setContactnumber(
+                                            persistentUser.setContactNumber(
                                                 (Long) user.get("contactNo"));
                                             persistentUser.setUserid(documentReference.getId());
                                             persistentUser.setAge(
