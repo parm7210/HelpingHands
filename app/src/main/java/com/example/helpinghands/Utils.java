@@ -154,14 +154,11 @@ public class Utils {
     }
 
     static void sendFcmNotifications(
-            Activity activity, String receiver, String title, String body){
+            Activity activity, String receiver, JSONObject jsonNotification){
         RequestQueue requestQueue = Volley.newRequestQueue(activity);
         JSONObject jsonObject = new JSONObject();
         try {
             jsonObject.put("to", receiver);
-            JSONObject jsonNotification = new JSONObject();
-            jsonNotification.put("title", title);
-            jsonNotification.put("body", body);
             jsonObject.put("data", jsonNotification);
             JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST, fcmUrl, jsonObject, new Response.Listener<JSONObject>() {
                 @Override

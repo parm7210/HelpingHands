@@ -1,5 +1,7 @@
 package com.example.helpinghands;
 
+import static com.example.helpinghands.Utils.checkInternetStatus;
+import static com.example.helpinghands.Utils.noInternetConnectionAlert;
 import static com.example.helpinghands.Utils.sendFcmNotifications;
 
 import android.Manifest;
@@ -27,9 +29,25 @@ import android.widget.ImageButton;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FieldValue;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QuerySnapshot;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.HashMap;
+import java.util.Map;
+
 
 public class HomeFragment extends Fragment {
 
+    static FirebaseFirestore db;
     private User user;
     private ImageButton e911Btn;
     private Activity activity;
@@ -167,6 +185,7 @@ public class HomeFragment extends Fragment {
         e911Btn = root.findViewById(R.id.e911Btn);
         sosBtn = root.findViewById(R.id.triggerSOSBtn);
         broadcastRequestBtn = root.findViewById(R.id.broadcastRequestBtn);
+        db = FirebaseFirestore.getInstance();
         e911Btn.setOnClickListener(v -> {
             if(ContextCompat.checkSelfPermission(
                 activity, Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED){
@@ -178,7 +197,7 @@ public class HomeFragment extends Fragment {
         });
         sosBtn.setOnCheckedChangeListener((buttonView, isChecked) -> {
             if(isChecked){
-                if(ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.SEND_SMS) != PackageManager.PERMISSION_GRANTED){
+                if(ContextCompat.checkSelfPermission(activity, Manifest.permission.SEND_SMS) != PackageManager.PERMISSION_GRANTED){
                     Log.v(LOGNAME, "User permission not provided. Asking to grant the permission");
                     requestPermissions(new String[]{Manifest.permission.SEND_SMS},122);
                 }
@@ -201,7 +220,6 @@ public class HomeFragment extends Fragment {
                                 Intent intent = new Intent(getContext(), EmergencyContactsActivity.class);
                                 startActivity(intent);
                                 ((Activity)getContext()).overridePendingTransition(R.anim.slide_in_right,R.anim.slide_out_left);
-                                return;
                             }
                         });
                         builder.show();
@@ -250,8 +268,48 @@ public class HomeFragment extends Fragment {
             }
         });
         broadcastRequestBtn.setOnClickListener(v -> {
-            String topic = user.getLocaleCity();
-            sendFcmNotifications(requireActivity(), "/topics/"+topic, "Demo Title", "Demo Body");
+            if(user.getLatitude() != "" && user.getLongitude() != "") {
+                if (!checkInternetStatus()) { noInternetConnectionAlert(requireActivity()); }
+                else {
+                    final User user = new User(requireActivity());
+                    db.collection("emergency_requests").whereEqualTo("userId",user.getUserid()).whereEqualTo("Status","Active").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                        @Override
+                        public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                            if(task.getResult().size() > 0){
+                                Toast.makeText(getActivity(), "Emergency signal is already started.", Toast.LENGTH_SHORT).show();
+                            }
+                            else {
+                                Map<String, Object> ERequest = new HashMap<>();
+                                ERequest.put("ContactNumber", user.getContactNumber());
+                                ERequest.put("UserType", user.getType());
+                                ERequest.put("Status", "Active");
+                                ERequest.put("VolunteerID", "");
+                                ERequest.put("VolunteerNo", 0);
+                                ERequest.put("Latitude", user.getLatitude());
+                                ERequest.put("Longitude", user.getLongitude());
+                                ERequest.put("lcity", user.getLocaleCity());
+                                ERequest.put("userId", user.getUserid());
+                                ERequest.put("created", FieldValue.serverTimestamp());
+                                db.collection("emergency_requests").add(ERequest).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                                    @Override
+                                    public void onSuccess(final DocumentReference documentReference) {
+                                        ERequest.put("Type", "ERequest");
+                                        JSONObject jsonObject = new JSONObject(ERequest);
+                                        sendFcmNotifications(requireActivity(), "/topics/"+user.getLocaleCity(), jsonObject);
+                                        Toast.makeText(getActivity(), "Emergency Request Broadcasted", Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+                            }
+                        }
+                    });
+
+                }
+            }
+            else{
+                Intent in = new Intent(getActivity(),MainActivity.class);
+                startActivity(in);
+                ((Activity)getContext()).overridePendingTransition(0,0);
+            }
         });
 
         return root;
