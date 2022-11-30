@@ -2,9 +2,17 @@ package com.example.helpinghands;
 
 import static android.content.Context.LOCATION_SERVICE;
 
+import static com.example.helpinghands.Utils.checkInternetStatus;
+import static com.example.helpinghands.Utils.findLocality;
+import static com.example.helpinghands.Utils.updateLocality;
+import static com.google.android.gms.maps.GoogleMap.MAP_TYPE_NORMAL;
+import static java.lang.Thread.currentThread;
+import static java.lang.Thread.sleep;
+
 import android.Manifest;
 import android.app.AlertDialog;
 import android.app.PendingIntent;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -14,8 +22,8 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.location.Address;
-import android.location.Geocoder;
 import android.location.Location;
+import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 
@@ -31,7 +39,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
@@ -40,10 +51,13 @@ import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -68,7 +82,7 @@ public class MapFragment extends Fragment {
 
     static List<Volunteer> volunteerList = new ArrayList<Volunteer>();
     LocationManager locationManager;
-    static LatLng curPosition;
+    static LatLng currPosition;
     static User user;
     static FirebaseFirestore db;
     private ImageButton recenter;
@@ -98,29 +112,157 @@ public class MapFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_map, container, false);
+        final View root = inflater.inflate(R.layout.fragment_map, container, false);
+        volunteerList = new ArrayList<Volunteer>();
+        recenter = (ImageButton)root.findViewById(R.id.recenterBtn);
+        recenter.setVisibility(View.INVISIBLE);
+        SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.mapFrag);
+        final ProgressDialog progressBar1;
+        progressBar1 = new ProgressDialog(getContext());
+        progressBar1.setMessage("Finding current location...");
+        progressBar1.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        progressBar1.setCancelable(true);
+        progressBar1.setOnCancelListener(new DialogInterface.OnCancelListener() {
+            @Override
+            public void onCancel(DialogInterface dialog) {
+                Intent intent = new Intent(getContext(), MainActivity.class);
+                startActivity(intent);
+                getActivity().overridePendingTransition(R.anim.slide_in_left,R.anim.slide_out_right);
+            }
+        });
+        db = FirebaseFirestore.getInstance();
+        user = new User(getActivity());
+
+        mapFragment.getMapAsync(new OnMapReadyCallback() {
+            @Override
+            public void onMapReady(final GoogleMap mMap) {
+
+                if (!checkInternetStatus()) { internetDisabledAlert(); }
+                else{
+                    locationManager = (LocationManager) getActivity().getSystemService(LOCATION_SERVICE);
+                    if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                        requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 123);
+                    }
+                    else {
+                        if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) { gpsDisabledAlert(); }
+                        else {
+
+//                            currPosition = new LatLng(0,0);  /*for testing purpose only*/
+                            currPosition = fetchCurrLocation();
+
+                            /*set map attributes -------------------------------- */
+                            mMap.setMapType(MAP_TYPE_NORMAL);
+                            mMap.clear();
+                            googlePlex = CameraPosition.builder().target(currPosition).zoom((float) 13.5).bearing(0).build();
+                            circle = drawCircle(currPosition, mMap);//draw the circle of 2.5km radius
+                            final Marker mark = setMarker(mMap, currPosition);//set the marker attribute
+                            mMap.setOnCameraMoveStartedListener(new GoogleMap.OnCameraMoveStartedListener() {
+                                @Override
+                                public void onCameraMoveStarted(int i) {
+                                    if (i == 1) {
+                                        focus = 0;
+                                        recenter.setVisibility(View.VISIBLE);
+                                    }
+                                }
+                            });
+                            mMap.animateCamera(CameraUpdateFactory.newCameraPosition(googlePlex), 10, null);
+
+                            /*if last known location is null -----------------------*/
+                            if(currPosition.latitude == 0){
+                                progressBar1.show();
+                                locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, new LocationListener() {
+                                    @Override
+                                    public void onLocationChanged(Location location) {
+                                        locationManager.removeUpdates(this);
+                                        Log.v(TAG,"current location: "+location);
+                                        currPosition = new LatLng(location.getLatitude(),location.getLongitude());
+                                        setUserLocation(user, currPosition);
+                                        address = findLocality(getContext(), currPosition);
+                                        updateLocality(db, user, address);
+                                        mark.setPosition(currPosition);
+                                        circle.setCenter(currPosition);
+                                        googlePlex = CameraPosition.builder().target(currPosition).zoom((float) 13.5).bearing(0).build();
+                                        mMap.animateCamera(CameraUpdateFactory.newCameraPosition(googlePlex), 1000, null);
+                                        progressBar1.dismiss();
+                                    }
+                                    @Override
+                                    public void onStatusChanged(String provider, int status, Bundle extras) {}
+                                    @Override
+                                    public void onProviderEnabled(String provider) {}
+                                    @Override
+                                    public void onProviderDisabled(String provider) {}
+                                });
+                            }
+                            else{
+                                setUserLocation(user, currPosition);
+                                address = findLocality(getContext(), currPosition);
+                                updateLocality(db, user, address);
+                                startVolunteerDiscoveryThread(mMap);
+                            }
+
+                            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, new LocationListener() {
+                                @Override
+                                public void onLocationChanged(Location location) {
+                                    progressBar1.dismiss();
+                                    if (currPosition.latitude == location.getLatitude() && currPosition.longitude == location.getLongitude()) {
+                                        Log.v(TAG, "Location updated (SAME VALUE)");
+                                        //Log.v(TAG, "Thread 3: " + currentThread().getName() + currentThread().getId());
+                                    } else {
+                                        currPosition = new LatLng(location.getLatitude(), location.getLongitude());
+                                        setUserLocation(user, currPosition);
+                                        Log.v(TAG, "Location updated: " + location.getLatitude() + ", " + location.getLongitude());
+                                        //Log.v(TAG, "ThreadId4: " + currentThread().getName() + currentThread().getId());
+                                        mark.setPosition(currPosition);
+                                        circle.setCenter(currPosition);
+                                        if(focus == 1){
+                                            googlePlex = CameraPosition.builder().target(currPosition).zoom((float) 13.5).bearing(0).build();
+                                            mMap.animateCamera(CameraUpdateFactory.newCameraPosition(googlePlex), 1000, null);
+                                        }
+                                    }
+                                }
+                                @Override
+                                public void onStatusChanged(String provider, int status, Bundle extras) {}
+                                @Override
+                                public void onProviderEnabled(String provider) {}
+                                @Override
+                                public void onProviderDisabled(String provider) {}
+                            });
+                            recenter.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    focus = 1;
+                                    googlePlex = CameraPosition.builder().target(currPosition).zoom((float) 13.5).bearing(0).build();
+                                    mMap.animateCamera(CameraUpdateFactory.newCameraPosition(googlePlex), 1000, null);
+                                    recenter.setVisibility(View.INVISIBLE);
+                                }
+                            });
+                        }
+                    }
+                }
+            }
+        });
+        return root;
     }
 
     @Override
     public void onRequestPermissionsResult(int requestCode,String[] permissions, int[] grantResults) {
         switch (requestCode) {
             case 123: {
-//                if (grantResults.length > 0
-//                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-//                    Log.v(TAG,"Location permission granted");
-////                    locationfetch(); TODO
-//                    NavController nc = Navigation.findNavController(getActivity(), R.id.nav_host_fragment);
-//                    PendingIntent Pin = nc.createDeepLink().setDestination(R.id.navigation_map).createPendingIntent();
-//                    try {
-//                        Pin.send();
-//                        getActivity().overridePendingTransition(0,0);
-//                    } catch (PendingIntent.CanceledException e) {
-//                        e.printStackTrace();
-//                    }
-//                } else {
-//                    Log.v(TAG,"Location permission rejected");
-//                }
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    Log.v(TAG,"Location permission granted");
+                    fetchCurrLocation();
+                    NavController nc = Navigation.findNavController(getActivity(), R.id.fragmentContainerView); /*TODO: Change inflator*/
+                    PendingIntent Pin = nc.createDeepLink().setDestination(R.id.mapFragment).createPendingIntent();
+                    try {
+                        Pin.send();
+                        getActivity().overridePendingTransition(0,0);
+                    } catch (PendingIntent.CanceledException e) {
+                        e.printStackTrace();
+                    }
+                } else {
+                    Log.v(TAG,"Location permission rejected");
+                }
                 return;
             }
         }
@@ -173,11 +315,11 @@ public class MapFragment extends Fragment {
         return circle;
     }
 
-    public void setUserLocation(User myuser,LatLng my_position){
+    public void setUserLocation(User myUser,LatLng my_position){
         Log.v(TAG,"Setting User location: "+my_position);
-        myuser.setLatitude(Double.toString(my_position.latitude));
-        myuser.setLongitude(Double.toString(my_position.longitude));
-        db.collection("user_details").document(myuser.getUserid()).update("latitude",my_position.latitude, "longitude",my_position.longitude).addOnFailureListener(new OnFailureListener() {
+        myUser.setLatitude(Double.toString(my_position.latitude));
+        myUser.setLongitude(Double.toString(my_position.longitude));
+        db.collection("user_details").document(myUser.getUserid()).update("latitude",my_position.latitude, "longitude",my_position.longitude).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception e) {
                 Log.v(TAG,"ERROR UPDATING LOCATION IN DATABASE");
@@ -194,7 +336,7 @@ public class MapFragment extends Fragment {
             requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION},123);
         }
         currentLoc = locationManager.getLastKnownLocation(locationManager.NETWORK_PROVIDER);
-        Log.v(TAG,"Last known location(NETWORK): " + currentLoc);
+        Log.v(TAG,"Last known location (NETWORK): " + currentLoc);
         if(currentLoc == null){ return  new LatLng(0,0); }
         else{return new LatLng(currentLoc.getLatitude(),currentLoc.getLongitude());}
     }
@@ -217,7 +359,7 @@ public class MapFragment extends Fragment {
         alert.show();
     }
 
-    public void internetDisableAlert(){
+    public void internetDisabledAlert(){
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setCancelable(false);
         builder.setTitle("No Internet Connection");
@@ -232,4 +374,90 @@ public class MapFragment extends Fragment {
         });
         builder.show();
     }
+
+    public void discoverVolunteers(GoogleMap map, LatLng position, String myUserId, String locality){
+        final LatLng currPosition = position;
+        final GoogleMap mMap = map;
+        final String userId = myUserId;
+        Log.d(TAG,"Current Location of user: "+currPosition);
+        while(1 == 1) {
+            if (volunteerList != null) {
+                for (Volunteer volunteer : volunteerList ) {
+                    if(currFlag == volunteer.flag) {
+                        volunteerList.remove(volunteer);
+                        marker = volunteer.marker;
+                        Log.v(TAG,"Removing Marker of "+ volunteer.userId);
+                        getActivity().runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                marker.remove();
+                            }
+                        });
+                    }
+                }
+            }
+            db.collection("user_details").whereEqualTo("localeCity", locality).whereEqualTo("type","1").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                @Override
+                public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                    if (task.isSuccessful()) {
+                        for (QueryDocumentSnapshot document : task.getResult()) {
+                            if (document.getId().equals(userId))
+                                continue;
+                            int i;
+                            for(i = 0; i < volunteerList.size(); i++){
+                                Volunteer volunteer = volunteerList.get(i);
+                                if(volunteer.getUserId().equals(document.getId())){
+                                    LatLng latLng = new LatLng(Double.parseDouble(document.get("latitude").toString()), Double.parseDouble(document.get("longitude").toString()));
+                                    Log.d(TAG, "Checking for existence: "+document.get("firstName").toString() + " " + latLng.toString());
+                                    if (distance(latLng, currPosition) < 2.5) {
+                                        Log.v(TAG, "Existing Entry: "+document.get("firstName").toString());
+                                        Marker marker = volunteer.getMarker();
+                                        marker.setPosition(new LatLng(Double.parseDouble(document.get("latitude").toString()), Double.parseDouble(document.get("longitude").toString())));
+                                        volunteer.flag = currFlag;
+                                    }
+                                    break;
+                                }
+                            }
+                            if(i == volunteerList.size()){
+                                LatLng latLng = new LatLng(Double.parseDouble(document.get("latitude").toString()), Double.parseDouble(document.get("longitude").toString()));
+                                Log.d(TAG,"Checking for New: "+document.get("firstName").toString() +" "+ latLng.toString());
+                                if (distance(latLng, currPosition) < 2.5) {
+                                    Volunteer volunteer = new Volunteer();
+                                    volunteer.flag = currFlag;
+                                    volunteer.marker = mMap.addMarker(new MarkerOptions()
+                                            .position(latLng)
+                                            .title("Volunteer")
+                                            .icon(bitmapDescriptorFromVector(getActivity(), R.drawable.baseline_volunteer_location_on_24)));
+                                    volunteer.setUserId(document.getId());
+                                    volunteerList.add(volunteer);
+                                    Log.d(TAG,"New Entry Added: "+document.get("firstName").toString() +" "+ latLng.toString());
+                                }
+                            }
+                        }
+                    } else {
+                        Log.v(TAG, "Database Error in fetching");
+                    }
+                }
+            });
+            try {
+                sleep(5000);
+                currFlag = !currFlag;
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public void startVolunteerDiscoveryThread(GoogleMap map){
+        final GoogleMap myMap = map;
+        Log.v(TAG,"(VT)ThreadId1: "+currentThread().getName() + currentThread().getId());
+        Thread thread = new Thread(){
+            public void run(){
+                Log.v(TAG,"Starting Volunteer Thread: "+currentThread().getName() + currentThread().getId());
+                discoverVolunteers(myMap, currPosition, user.getUserid(), address.getLocality());
+            }
+        };
+        thread.start();
+    }
+
 }

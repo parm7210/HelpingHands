@@ -57,7 +57,7 @@ public class HomeFragment extends Fragment {
             flag = 1;
             //https://www.google.com/maps/@43.44395,-80.5214339,18z
             //https://www.google.com/maps/?q=43.44395,-80.5214339
-            lastLocation = "Last known location of is in this area :\n";
+            lastLocation = "Last known location of "+user.getFName()+":\n";
             lastLocation = lastLocation + "https://www.google.com/maps/?q="+user.getLatitude()+","+user.getLongitude();
             Log.v(LOGNAME, "Message sent: " + lastLocation);
         }
@@ -87,16 +87,20 @@ public class HomeFragment extends Fragment {
         Thread sos = new Thread(){
             public void run(){
                 Log.v("SOSThread","Thread Started");
-                new CountDownTimer(5000,1000){
+                new CountDownTimer(20000,1000){
                     @Override
                     public void onTick(long millisUntilFinished) {
-                        if(currUser.getSOSflag() == 0){this.cancel();Log.v("SOSThread","Thread Ended");}
+                        if(currUser.getSOSflag() == 0)
+                        {
+                            this.cancel();
+                            Log.v("SOSThread","Thread Ended");
+                        }
                     }
                     @Override
                     public void onFinish() {
                         if(currUser.getLatitude() != "" && currUser.getLongitude() != ""){
                             String lastLocation = "Last Known Location is in this area :\n";
-                            lastLocation = lastLocation + "https://www.google.com/maps/@"+currUser.getLatitude()+","+currUser.getLongitude()+",18z";
+                            lastLocation = lastLocation + "https://www.google.com/maps/q?"+currUser.getLatitude()+","+currUser.getLongitude();
                             Log.v(LOGNAME,"Sending Message = "+lastLocation);
                             if(currUser.getEcon1()!=0){sendSMS(currUser.getEcon1().toString(),lastLocation);}
                             if(currUser.getEcon2()!=0){sendSMS(currUser.getEcon2().toString(),lastLocation);}

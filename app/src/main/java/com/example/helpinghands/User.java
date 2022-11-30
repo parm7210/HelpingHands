@@ -308,9 +308,9 @@ public class User {
         return localeCity;
     }
 
-    public void setLocaleCity(String lcity) {
-        this.localeCity = lcity;
-        sharedPreferences.edit().putString("localeCity",lcity).apply();
+    public void setLocaleCity(String localeCity) {
+        this.localeCity = localeCity;
+        sharedPreferences.edit().putString("localeCity",localeCity).apply();
     }
 
     public  void removeUser(){
