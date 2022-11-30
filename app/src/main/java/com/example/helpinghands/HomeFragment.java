@@ -1,12 +1,10 @@
 package com.example.helpinghands;
 
-import static androidx.core.content.ContextCompat.getSystemService;
+import static com.example.helpinghands.Utils.sendFcmNotifications;
 
 import android.Manifest;
 import android.app.Activity;
-import android.app.ActivityManager;
 import android.app.AlertDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -19,6 +17,7 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 
+
 import android.telephony.SmsManager;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -27,8 +26,6 @@ import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.Toast;
 import android.widget.ToggleButton;
-
-import java.util.Objects;
 
 
 public class HomeFragment extends Fragment {
@@ -249,9 +246,8 @@ public class HomeFragment extends Fragment {
             }
         });
         broadcastRequestBtn.setOnClickListener(v -> {
-            Toast.makeText(
-                    activity,"This feature is coming in next version.",
-                    Toast.LENGTH_SHORT).show();
+            String topic = user.getLocaleCity();
+            sendFcmNotifications(requireActivity(), "/topics/"+topic, "Demo Title", "Demo Body");
         });
 
         return root;
