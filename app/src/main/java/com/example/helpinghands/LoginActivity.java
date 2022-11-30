@@ -123,7 +123,7 @@ public class LoginActivity extends AppCompatActivity {
         loginBtn.setOnClickListener(v -> {
             if(validateInputs()) {
 
-                if (!checkInternetStatus()) {
+                if (!checkInternetStatus(getApplicationContext())) {
                     noInternetConnectionAlert(LoginActivity.this);
                 }
                 else{

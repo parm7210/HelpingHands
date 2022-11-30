@@ -103,7 +103,7 @@ public class EmergencyContactsActivity extends AppCompatActivity {
             }
             if(validation){
 
-                if(!checkInternetStatus()){
+                if(!checkInternetStatus(getApplicationContext())){
                     noInternetConnectionAlert(this);
                 }
                 else {

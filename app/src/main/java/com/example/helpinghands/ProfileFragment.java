@@ -158,7 +158,7 @@ public class ProfileFragment extends Fragment {
 
     private void deleteAccount() {
 
-        if (!checkInternetStatus()) {
+        if (!checkInternetStatus(requireContext())) {
             noInternetConnectionAlert(activity);
         }
         else{
@@ -195,7 +195,7 @@ public class ProfileFragment extends Fragment {
     }
 
     private void changePassword() {
-        if (!checkInternetStatus()) {
+        if (!checkInternetStatus(requireContext())) {
             noInternetConnectionAlert(activity);
         }
         else{

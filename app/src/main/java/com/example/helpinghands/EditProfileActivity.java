@@ -134,7 +134,7 @@ public class EditProfileActivity extends AppCompatActivity {
         updateBtn.setOnClickListener(v -> {
             if(validateInputs()){
 
-                if (!checkInternetStatus()) {
+                if (!checkInternetStatus(getApplicationContext())) {
                     noInternetConnectionAlert(this);
                 }
                 else {

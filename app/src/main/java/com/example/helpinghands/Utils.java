@@ -11,7 +11,11 @@ import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
+import android.location.LocationListener;
 import android.location.LocationManager;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -30,7 +34,6 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.messaging.FirebaseMessaging;
-import com.google.firebase.messaging.FirebaseMessagingService;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -41,20 +44,14 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-public class Utils {
+public class Utils{
     private static final String TAG = "Helper Utils";
     private static final String serverKey = "AAAAaJLZpX0:APA91bGefpRpVCrPFtF0UF3kQu4ZXEdRp-Rqu-H2MzNtHcm5JgL6JEHzo8JuA6FSw5kWm-pdGqAhVfGj1jVDkGOmPxAQ-PtZ6m4H8kduGJ0wIyu2JA1wbIZKBX26bb489aEmC6Nx04gE";
     private static final String fcmUrl = "https://fcm.googleapis.com/fcm/send";
-    public static boolean checkInternetStatus(){
-        boolean status = false;
-        try {
-            final String command = "ping -c 1 google.com";
-            status = (Runtime.getRuntime().exec(command).waitFor() == 0);
-            Log.v(TAG, "Network Status: " + status);
-        } catch (Exception e) {
-            Log.e(TAG,"Network Error: "+e.toString());
-        }
-        return status;
+    public static boolean checkInternetStatus(Context context){
+        ConnectivityManager cm = (ConnectivityManager)context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo nInfo = cm.getActiveNetworkInfo();
+        return nInfo != null && nInfo.isConnected();
     }
 
     public static void noInternetConnectionAlert(Context context){
@@ -79,7 +76,7 @@ public class Utils {
         else{return new LatLng(currentLoc.getLatitude(),currentLoc.getLongitude());}
     }
 
-    public static void setUserLocation(Activity activity, FirebaseFirestore db, User myUser, LatLng myPosition){
+    public static void setUserLocation(Context activity, FirebaseFirestore db, User myUser, LatLng myPosition){
         Log.v(TAG,"Setting User location: "+myPosition);
         myUser.setLatitude(Double.toString(myPosition.latitude));
         myUser.setLongitude(Double.toString(myPosition.longitude));
@@ -184,4 +181,5 @@ public class Utils {
             e.printStackTrace();
         }
     }
+
 }

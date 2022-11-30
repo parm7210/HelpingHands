@@ -269,16 +269,16 @@ public class HomeFragment extends Fragment {
         });
         broadcastRequestBtn.setOnClickListener(v -> {
             if(user.getLatitude() != "" && user.getLongitude() != "") {
-                if (!checkInternetStatus()) { noInternetConnectionAlert(requireActivity()); }
+                if (!checkInternetStatus(requireContext())) { noInternetConnectionAlert(requireActivity()); }
                 else {
                     final User user = new User(requireActivity());
                     db.collection("emergency_requests").whereEqualTo("userId",user.getUserid()).whereEqualTo("Status","Active").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                         @Override
                         public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                            if(task.getResult().size() > 0){
-                                Toast.makeText(getActivity(), "Emergency signal is already started.", Toast.LENGTH_SHORT).show();
-                            }
-                            else {
+//                            if(task.getResult().size() > 0){
+//                                Toast.makeText(getActivity(), "Emergency signal is already started.", Toast.LENGTH_SHORT).show();
+//                            }
+//                            else {
                                 Map<String, Object> ERequest = new HashMap<>();
                                 ERequest.put("ContactNumber", user.getContactNumber());
                                 ERequest.put("UserType", user.getType());
@@ -299,7 +299,7 @@ public class HomeFragment extends Fragment {
                                         Toast.makeText(getActivity(), "Emergency Request Broadcasted", Toast.LENGTH_SHORT).show();
                                     }
                                 });
-                            }
+//                            }
                         }
                     });
 

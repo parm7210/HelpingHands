@@ -87,7 +87,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void getLocation(){
 
-        if(checkInternetStatus()){
+        if(checkInternetStatus(getApplicationContext())){
             locationManager = (LocationManager) this.getSystemService(LOCATION_SERVICE);
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                 requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 123);
@@ -130,6 +130,8 @@ public class MainActivity extends AppCompatActivity {
                             } else {
                                 currentPosition = new LatLng(location.getLatitude(), location.getLongitude());
                                 setUserLocation(MainActivity.this, db, user, currentPosition);
+                                address = findLocality(getApplicationContext(), currentPosition);
+                                updateLocality(db, user, address);
                                 Log.v(TAG, "Location updated: " + location.getLatitude() + ", " + location.getLongitude());
                             }
                         }

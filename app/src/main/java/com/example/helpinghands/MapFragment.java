@@ -137,7 +137,7 @@ public class MapFragment extends Fragment {
             @Override
             public void onMapReady(final GoogleMap mMap) {
 
-                if (!checkInternetStatus()) { internetDisabledAlert(); }
+                if (!checkInternetStatus(requireContext())) { internetDisabledAlert(); }
                 else{
                     locationManager = (LocationManager) getActivity().getSystemService(LOCATION_SERVICE);
                     if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {

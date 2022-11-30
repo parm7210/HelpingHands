@@ -1,11 +1,12 @@
 package com.example.helpinghands.services;
 
+import static com.example.helpinghands.Utils.setUserLocation;
+
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
@@ -14,6 +15,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.core.app.NotificationCompat;
 
+import com.example.helpinghands.BGLocationListener;
 import com.example.helpinghands.MainActivity;
 import com.example.helpinghands.R;
 import com.example.helpinghands.User;
@@ -106,6 +108,12 @@ public class CustomFirebaseMessagingService extends FirebaseMessagingService {
             new Handler(Looper.getMainLooper()).post(new Runnable() {
                 @Override
                 public void run() {
+                    LatLng currentPosition = new BGLocationListener().locationFetchBG(getApplicationContext());
+                    FirebaseFirestore db = FirebaseFirestore.getInstance();
+                    User myUser = new User(getApplicationContext());
+                    if (currentPosition!=null){
+                        setUserLocation(getApplicationContext(), db, myUser, currentPosition);
+                    }
                     JSONObject jsonObject = new JSONObject(remoteMessage.getData());
                     User user = new User(CustomFirebaseMessagingService.this);
                     try {

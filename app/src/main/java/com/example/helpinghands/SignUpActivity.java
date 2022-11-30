@@ -200,7 +200,7 @@ public class SignUpActivity extends AppCompatActivity {
                 boolean validation = validateInputs();
                 if(validation){
 
-                    if(!checkInternetStatus()){
+                    if(!checkInternetStatus(getApplicationContext())){
                         noInternetConnectionAlert(SignUpActivity.this);
                     }
                     else{
