@@ -173,18 +173,18 @@ public class MainActivity extends AppCompatActivity {
                 });
         this.runOnUiThread(this::getLocation);
 
-        String FragmentName = getIntent().getStringExtra("FragmentName");
-        if (FragmentName != null) {
-            if (FragmentName.equals("RequestFrag")) {
-                Fragment fragment = new RequestsFragment();
-                FragmentManager fragmentManager = this.getSupportFragmentManager();
-                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-                fragmentTransaction.replace(R.id.fragmentContainerView, fragment);
-                fragmentTransaction.addToBackStack("Name");
-                fragmentTransaction.commit();
-
-            }
-        }
+//        String FragmentName = getIntent().getStringExtra("FragmentName");
+//        if (FragmentName != null) {
+//            if (FragmentName.equals("RequestFrag")) {
+//                Fragment fragment = new RequestsFragment();
+//                FragmentManager fragmentManager = this.getSupportFragmentManager();
+//                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+//                fragmentTransaction.replace(R.id.fragmentContainerView, fragment);
+//                fragmentTransaction.addToBackStack("Name");
+//                fragmentTransaction.commit();
+//
+//            }
+//        }
 
     }
 
