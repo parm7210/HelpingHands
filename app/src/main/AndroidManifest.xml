@@ -31,28 +31,36 @@
 
         <activity
             android:name=".EmergencyContactsActivity"
-            android:exported="false">
+            android:exported="false"
+            android:label="Emergency Contacts"
+            android:screenOrientation="portrait">
             <meta-data
                 android:name="android.app.lib_name"
                 android:value="" />
         </activity>
         <activity
             android:name=".EditProfileActivity"
-            android:exported="false">
+            android:exported="false"
+            android:label="Edit Profile"
+            android:screenOrientation="portrait">
             <meta-data
                 android:name="android.app.lib_name"
                 android:value="" />
         </activity>
         <activity
             android:name=".SignUpActivity"
-            android:exported="false">
+            android:exported="false"
+            android:label="Sign Up - Helping Hands"
+            android:screenOrientation="portrait">
             <meta-data
                 android:name="android.app.lib_name"
                 android:value="" />
         </activity>
         <activity
             android:name=".LoginActivity"
-            android:exported="false">
+            android:exported="false"
+            android:label="Login - Helping Hands"
+            android:screenOrientation="portrait">
             <meta-data
                 android:name="android.app.lib_name"
                 android:value="" />
@@ -72,7 +80,9 @@
         </activity>
         <activity
             android:name=".MainActivity"
-            android:exported="false">
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:taskAffinity="">
             <meta-data
                 android:name="android.app.lib_name"
                 android:value="" />

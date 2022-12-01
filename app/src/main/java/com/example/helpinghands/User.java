@@ -32,7 +32,7 @@ public class User {
     private String firstName;
     private String latitude;
     private String longitude;
-    private int sosflag;
+    private int sosFlag;
     private String localeCity;
     private String requestorList;
     private boolean currflag;
@@ -44,13 +44,13 @@ public class User {
     }
 
     public int getSOSflag() {
-        sosflag = sharedPreferences.getInt("sosflag",0);
-        return sosflag;
+        sosFlag = sharedPreferences.getInt("sosFlag",0);
+        return sosFlag;
     }
 
-    public void setSOSflag(int sosflag) {
-        this.sosflag = sosflag;
-        sharedPreferences.edit().putInt("sosflag",sosflag).commit();
+    public void setSOSflag(int sosFlag) {
+        this.sosFlag = sosFlag;
+        sharedPreferences.edit().putInt("sosFlag",sosFlag).commit();
     }
 
     public String getPassword() {

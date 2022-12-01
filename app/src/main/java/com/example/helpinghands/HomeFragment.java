@@ -55,9 +55,9 @@ public class HomeFragment extends Fragment {
     private ImageButton broadcastRequestBtn;
     private final String LOGNAME = "HomeFragment";
     int cntFlag= 0;
+    public static String vid = "initial";
 
     public HomeFragment() {
-        // Required empty public constructor
     }
 
     @Override
