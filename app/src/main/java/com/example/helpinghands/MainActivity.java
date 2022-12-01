@@ -10,6 +10,9 @@ import static com.example.helpinghands.Utils.updateLocality;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.navigation.ui.AppBarConfiguration;
@@ -54,21 +57,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    public void onNewIntent(Intent intent){
-        super.onNewIntent(intent);
-        Log.v("position","NewMethod Here");
-        Bundle extras = intent.getExtras();
-        if(extras != null){
-            if(extras.containsKey("FragmentName")){
-                String str = extras.getString("FragmentName");
-                Log.v("position","NewMethod" + str);
-            }
-        }
-
-
-    }
-
-    @Override
     public void onRequestPermissionsResult(int requestCode,String[] permissions, int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == 123) {
@@ -105,8 +93,8 @@ public class MainActivity extends AppCompatActivity {
                                 Log.v(TAG,"current location: "+location);
                                 currentPosition = new LatLng(location.getLatitude(),location.getLongitude());
                                 setUserLocation(MainActivity.this, db, user, currentPosition);
-                                address = findLocality(getApplicationContext(), currentPosition);
-                                updateLocality(db, user, address);
+//                                address = findLocality(getApplicationContext(), currentPosition);
+//                                updateLocality(db, user, address);
                             }
                             @Override
                             public void onStatusChanged(String provider, int status, Bundle extras) {}
@@ -130,8 +118,8 @@ public class MainActivity extends AppCompatActivity {
                             } else {
                                 currentPosition = new LatLng(location.getLatitude(), location.getLongitude());
                                 setUserLocation(MainActivity.this, db, user, currentPosition);
-                                address = findLocality(getApplicationContext(), currentPosition);
-                                updateLocality(db, user, address);
+//                                address = findLocality(getApplicationContext(), currentPosition);
+//                                updateLocality(db, user, address);
                                 Log.v(TAG, "Location updated: " + location.getLatitude() + ", " + location.getLongitude());
                             }
                         }
@@ -167,9 +155,6 @@ public class MainActivity extends AppCompatActivity {
                 this, navController, appBarConfiguration);
         NavigationUI.setupWithNavController(bottomNavigationView, navController);
 
-        String FragmentName = getIntent().getStringExtra("FragmentName");
-        Log.v("position","First" + FragmentName);
-
         db = FirebaseFirestore.getInstance();
         user = new User(this);
         FirebaseMessaging.getInstance().getToken()
@@ -188,6 +173,18 @@ public class MainActivity extends AppCompatActivity {
                 });
         this.runOnUiThread(this::getLocation);
 
+        String FragmentName = getIntent().getStringExtra("FragmentName");
+        if (FragmentName != null) {
+            if (FragmentName.equals("RequestFrag")) {
+                Fragment fragment = new RequestsFragment();
+                FragmentManager fragmentManager = this.getSupportFragmentManager();
+                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+                fragmentTransaction.replace(R.id.fragmentContainerView, fragment);
+                fragmentTransaction.addToBackStack("Name");
+                fragmentTransaction.commit();
+
+            }
+        }
 
     }
 

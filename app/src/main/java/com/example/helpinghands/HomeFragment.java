@@ -280,14 +280,14 @@ public class HomeFragment extends Fragment {
 //                            }
 //                            else {
                                 Map<String, Object> ERequest = new HashMap<>();
-                                ERequest.put("ContactNumber", user.getContactNumber());
-                                ERequest.put("UserType", user.getType());
-                                ERequest.put("Status", "Active");
-                                ERequest.put("VolunteerID", "");
-                                ERequest.put("VolunteerNo", 0);
-                                ERequest.put("Latitude", user.getLatitude());
-                                ERequest.put("Longitude", user.getLongitude());
-                                ERequest.put("lcity", user.getLocaleCity());
+                                ERequest.put("contactNo", user.getContactNumber());
+                                ERequest.put("type", user.getType());
+                                ERequest.put("status", "Active");
+                                ERequest.put("volunteerID", "");
+                                ERequest.put("volunteerNo", 0);
+                                ERequest.put("latitude", user.getLatitude());
+                                ERequest.put("longitude", user.getLongitude());
+                                ERequest.put("localeCity", user.getLocaleCity());
                                 ERequest.put("userId", user.getUserid());
                                 ERequest.put("created", FieldValue.serverTimestamp());
                                 db.collection("emergency_requests").add(ERequest).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {

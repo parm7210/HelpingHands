@@ -1,7 +1,6 @@
 package com.example.helpinghands.services;
 
-import static com.example.helpinghands.Utils.setUserLocation;
-
+import android.app.Activity;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -61,7 +60,7 @@ public class CustomFirebaseMessagingService extends FirebaseMessagingService {
         Intent notifyIntent = new Intent(context, MainActivity.class);
         notifyIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         notifyIntent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
-        notifyIntent.putExtra("FragmentName","MapFrag");
+        notifyIntent.putExtra("FragmentName","RequestFrag");
         PendingIntent notifyPendingIntent = PendingIntent.getActivity(context, 0, notifyIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         /*TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);
@@ -108,12 +107,8 @@ public class CustomFirebaseMessagingService extends FirebaseMessagingService {
             new Handler(Looper.getMainLooper()).post(new Runnable() {
                 @Override
                 public void run() {
-                    LatLng currentPosition = new BGLocationListener().locationFetchBG(getApplicationContext());
-                    FirebaseFirestore db = FirebaseFirestore.getInstance();
                     User myUser = new User(getApplicationContext());
-                    if (currentPosition!=null){
-                        setUserLocation(getApplicationContext(), db, myUser, currentPosition);
-                    }
+                    LatLng userLatLng = new LatLng(Double.parseDouble(myUser.getLatitude()), Double.parseDouble(myUser.getLongitude()));
                     JSONObject jsonObject = new JSONObject(remoteMessage.getData());
                     User user = new User(CustomFirebaseMessagingService.this);
                     try {
@@ -122,7 +117,7 @@ public class CustomFirebaseMessagingService extends FirebaseMessagingService {
                             switch (type) {
                                 case "ERequest":
                                     LatLng latLng = new LatLng(Double.parseDouble(jsonObject.getString("Latitude")), Double.parseDouble(jsonObject.getString("Longitude")));
-                                    if(distance(latLng, new LatLng(Double.parseDouble(user.getLatitude()), Double.parseDouble(user.getLongitude()))) < 2.5){
+                                    if(distance(latLng, userLatLng) < 2.5){
                                             notifyUser(getApplicationContext());
                                     }
                                     Toast.makeText(CustomFirebaseMessagingService.this, "Message data payload: " + jsonObject.toString(), Toast.LENGTH_LONG).show();
