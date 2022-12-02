@@ -34,6 +34,7 @@ public class User {
     private String longitude;
     private int sosFlag;
     private String localeCity;
+    private String volunteerId;
     private String requestorList;
     private boolean currflag;
 
@@ -317,4 +318,13 @@ public class User {
         sharedPreferences.edit().clear().apply();
     }
 
+    public String getVolunteerId() {
+        volunteerId = sharedPreferences.getString("volunteerId","");
+        return volunteerId;
+    }
+
+    public void setVolunteerId(String volunteerId) {
+        this.volunteerId = volunteerId;
+        sharedPreferences.edit().putString("volunteerId",volunteerId).apply();
+    }
 }

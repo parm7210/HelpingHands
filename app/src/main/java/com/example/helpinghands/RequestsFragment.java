@@ -20,6 +20,7 @@ import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -48,7 +49,7 @@ public class RequestsFragment extends Fragment {
         User user = new User(requireContext());
         RecyclerView recyclerView = root.findViewById(R.id.recyclerView);
 
-        List<RequestItem> itemList = new ArrayList<>();
+        final List<RequestItem> itemList = new ArrayList<>();
 
         if( !checkInternetStatus(requireContext())) {noInternetConnectionAlert(requireContext());}
         else {
@@ -63,29 +64,50 @@ public class RequestsFragment extends Fragment {
                     if (task.isSuccessful()) {
                         for (QueryDocumentSnapshot document : task.getResult()) {
                             RequestItem requestItem = new RequestItem(
+                                    "Help requested",
                                     document.getId(),
-                                    document.get("created")+"",
-                                    document.get("latitude")+"",
-                                    document.get("longitude")+"",
-                                    document.get("status")+"",
-                                    document.get("volunteerNo")+"",
-                                    document.get("localeCity")+"");
+                                    (Timestamp) document.get("created"),
+                                    document.get("latitude") + "",
+                                    document.get("longitude") + "",
+                                    document.get("status") + "",
+                                    document.get("volunteerNo") + "",
+                                    document.get("localeCity") + "");
                             itemList.add(requestItem);
                         }
+                        db.collection("emergency_requests").whereEqualTo("volunteerID", user.getUserid()).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                            @Override
+                            public void onComplete(@NonNull Task<QuerySnapshot> task1) {
+                                if (task1.isSuccessful()) {
+                                    for (QueryDocumentSnapshot document1 : task1.getResult()) {
+                                        RequestItem requestItem1 = new RequestItem(
+                                                "Help provided",
+                                                document1.getId(),
+                                                (Timestamp) document1.get("created"),
+                                                document1.get("latitude")+"",
+                                                document1.get("longitude")+"",
+                                                document1.get("status")+"",
+                                                document1.get("volunteerNo")+"",
+                                                document1.get("localeCity")+"");
+                                        itemList.add(requestItem1);
+                                    }
+                                    recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
+                                    recyclerView.setAdapter(new RequestListViewAdapter(getContext(), itemList, new RequestListViewAdapter.OnItemClickListener() {
+                                        @Override
+                                        public void onItemClick(View view, int position, List<RequestItem> itemList) {
+                                            new RequestItemView(requireActivity(), itemList.get(position)).show();
+
+                //                            Toast.makeText(requireContext(), "Position: "+ position, Toast.LENGTH_LONG).show();
+                                        }
+                                    }));
+                                    loadingDialogue.cancel();
+//                                    Toast.makeText(getActivity(), "" + itemList.size(), Toast.LENGTH_SHORT).show();
+                                }
+                            }
+                        });
                     }
                     else {
                         Toast.makeText(getActivity(), "Error connecting Database", Toast.LENGTH_SHORT).show();
                     }
-                    recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
-                    recyclerView.setAdapter(new RequestListViewAdapter(getContext(), itemList, new RequestListViewAdapter.OnItemClickListener() {
-                        @Override
-                        public void onItemClick(View view, int position, List<RequestItem> itemList) {
-                            new RequestItemView(requireActivity(), itemList.get(position)).show();
-
-//                            Toast.makeText(requireContext(), "Position: "+ position, Toast.LENGTH_LONG).show();
-                        }
-                    }));
-                    loadingDialogue.cancel();
                 }
             });
         }
@@ -96,14 +118,15 @@ public class RequestsFragment extends Fragment {
 
 class RequestItem {
     String requestId;
-    String timestamp;
+    Timestamp timestamp;
     String latitude;
     String longitude;
     String status;
     String volunteerNo;
     String city;
+    String type;
 
-    public RequestItem(String requestId, String timestamp, String latitude, String longitude, String status, String volunteerNo, String city) {
+    public RequestItem(String type, String requestId, Timestamp timestamp, String latitude, String longitude, String status, String volunteerNo, String city) {
         this.requestId = requestId;
         this.timestamp = timestamp;
         this.latitude = latitude;
@@ -111,6 +134,15 @@ class RequestItem {
         this.status = status;
         this.volunteerNo = volunteerNo;
         this.city = city;
+        this.type = type;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 
     public String getRequestId() {
@@ -121,11 +153,11 @@ class RequestItem {
         this.requestId = requestId;
     }
 
-    public String getTimestamp() {
+    public Timestamp getTimestamp() {
         return timestamp;
     }
 
-    public void setTimestamp(String timestamp) {
+    public void setTimestamp(Timestamp timestamp) {
         this.timestamp = timestamp;
     }
 
@@ -172,15 +204,16 @@ class RequestItem {
 
 class RequestListViewHolder extends RecyclerView.ViewHolder {
 
-    TextView city, status;
+    TextView date, status, type;
     Button stopRequest;
     View container;
 
     public RequestListViewHolder(@NonNull View itemView) {
         super(itemView);
-        city = itemView.findViewById(R.id.city);
+        date = itemView.findViewById(R.id.date);
         status = itemView.findViewById(R.id.status);
         stopRequest = itemView.findViewById(R.id.stopRequest);
+        type = itemView.findViewById(R.id.type);
         container = itemView;
     }
 }
@@ -220,20 +253,23 @@ class RequestListViewAdapter extends RecyclerView.Adapter<RequestListViewHolder>
     public void onBindViewHolder(@NonNull RequestListViewHolder holder, int position) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         String requestId = itemList.get(position).getRequestId();
-        holder.city.setText(itemList.get(position).getCity());
+        holder.date.setText(itemList.get(position).getTimestamp().toDate().toString());
+        holder.type.setText(itemList.get(position).getType());
         String status = itemList.get(position).getStatus();
         holder.status.setText(status);
-        if(!status.equals("Active")){ holder.stopRequest.setVisibility(View.GONE); }
+        if(status.equals("Resolved")){ holder.stopRequest.setVisibility(View.GONE); }
         else{
             holder.stopRequest.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    db.collection("emergency_requests").document(requestId).update("status","Aborted").addOnCompleteListener(new OnCompleteListener<Void>() {
+                    db.collection("emergency_requests").document(requestId).update("status","Resolved").addOnCompleteListener(new OnCompleteListener<Void>() {
                         @Override
                         public void onComplete(@NonNull Task<Void> task) {
                             if(task.isSuccessful()){
                                 holder.stopRequest.setVisibility(View.GONE);
-                                holder.status.setText("Aborted");
+                                holder.status.setText("Resolved");
+                                User user = new User(context);
+                                user.setVolunteerId("");
                                 Toast.makeText(context, "Request stopped successfully", Toast.LENGTH_SHORT).show();
                             }
                             else{

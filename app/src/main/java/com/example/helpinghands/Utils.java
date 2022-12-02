@@ -103,7 +103,7 @@ public class Utils{
                 myAddress = addressList.get(0);
                 Log.v(TAG,"Finding Locality: "+myAddress.getLocality());
             }
-        } catch (IOException e) {
+        } catch (Exception e) {
             Log.e(TAG, "Unable to connect to Geocoder(locality error)", e);
         }
         return myAddress;

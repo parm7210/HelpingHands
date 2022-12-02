@@ -4,6 +4,7 @@ import static android.content.Context.LOCATION_SERVICE;
 
 import static com.example.helpinghands.Utils.checkInternetStatus;
 import static com.example.helpinghands.Utils.findLocality;
+import static com.example.helpinghands.Utils.sendFcmNotifications;
 import static com.example.helpinghands.Utils.updateLocality;
 import static com.google.android.gms.maps.GoogleMap.MAP_TYPE_NORMAL;
 import static java.lang.Thread.currentThread;
@@ -26,6 +27,7 @@ import android.location.Address;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.os.AsyncTask;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -55,13 +57,19 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 class Volunteer {
     boolean flag;
@@ -235,21 +243,48 @@ public class MapFragment extends Fragment {
                                     {
                                         final String id = marker.getTitle();
                                         FirebaseFirestore db = FirebaseFirestore.getInstance();
-                                        db.collection("emergency_requests").document(id).update("Status","Accepted","VolunteerID",user.getUserid(),"VolunteerNo",user.getContactNumber()).addOnCompleteListener(new OnCompleteListener<Void>() {
+
+                                        final String[] token = new String[1];
+                                        token[0] = null;
+                                        db.collection("emergency_requests").document(id).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
                                             @Override
-                                            public void onComplete(@NonNull Task<Void> task) {
-                                                if(task.isSuccessful()){
-                                                    Toast.makeText(getActivity(),"Request Accepted", Toast.LENGTH_SHORT).show();
-                                                    Marker newmarker = mMap.addMarker(new MarkerOptions()
-                                                            .position(marker.getPosition())
-                                                            .title(marker.getTitle())
-                                                            .icon(bitmapDescriptorFromVector(myContext, R.drawable.accepted_request)));
-                                                }
-                                                else{
-                                                    Log.v(TAG,"Error accepting request");
-                                                }
+                                            public void onSuccess(DocumentSnapshot documentSnapshot) {
+                                                String userId = documentSnapshot.get("userId").toString();
+                                                db.collection("user_details").document(userId).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                                                    @Override
+                                                    public void onSuccess(DocumentSnapshot documentSnapshot) {
+                                                        token[0] = documentSnapshot.get("firebaseToken").toString();
+                                                        JSONObject jsonObject = new JSONObject();
+                                                        try {
+                                                            jsonObject.put("vid", user.getUserid());
+                                                            jsonObject.put("Type", "RequestAccept");
+                                                        } catch (JSONException e) {
+                                                            e.printStackTrace();
+                                                        }
+                                                        if (token[0] != null) {
+                                                            db.collection("emergency_requests").document(id).update("status","Accepted","volunteerID",user.getUserid(),"volunteerNo",user.getContactNumber()).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                                @Override
+                                                                public void onSuccess(Void unused) {
+                                                                sendFcmNotifications(requireActivity(), token[0], jsonObject);
+                                                                Toast.makeText(getActivity(), "Request Accepted", Toast.LENGTH_SHORT).show();
+                                                                Marker newmarker = mMap.addMarker(new MarkerOptions()
+                                                                        .position(marker.getPosition())
+                                                                        .title(marker.getTitle())
+                                                                        .icon(bitmapDescriptorFromVector(myContext, R.drawable.accepted_request)));
+
+                                                                }
+                                                            });
+                                                        }
+                                                        else {
+                                                            Toast.makeText(getActivity(), "Error connecting to database", Toast.LENGTH_SHORT).show();
+                                                        }
+                                                    }
+
+                                                });
                                             }
                                         });
+
+
                                     }
                                 }
                             });
@@ -552,7 +587,7 @@ public class MapFragment extends Fragment {
                                     volunteer.flag = currFlag;
                                     volunteer.setUserId(document.getId());
                                     volunteer.setUsertype("volunteer");
-                                    if(HomeFragment.vid.equals(document.getId()) ){
+                                    if(user.getVolunteerId().equals(document.getId()) ){
                                         volunteer.marker = mMap.addMarker(new MarkerOptions()
                                                 .position(latLng)
                                                 .title("Assigned Volunteer")
@@ -630,7 +665,7 @@ public class MapFragment extends Fragment {
                 }
             }
 
-            db.collection("emergency_requests").whereEqualTo("lcity", Locality).whereEqualTo("Status","Active").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            db.collection("emergency_requests").whereEqualTo("localeCity", Locality).whereEqualTo("status","Active").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                 @Override
                 public void onComplete(@NonNull Task<QuerySnapshot> task) {
                     if (task.isSuccessful()) {
@@ -641,11 +676,11 @@ public class MapFragment extends Fragment {
                             for(i = 0; i < requesterList.size(); i++){
                                 Requester requester = requesterList.get(i);
                                 if(requester.getUserId().equals(document.get("userId"))){
-                                    LatLng latLng = new LatLng(Double.parseDouble(document.get("Latitude").toString()), Double.parseDouble(document.get("Longitude").toString()));
+                                    LatLng latLng = new LatLng(Double.parseDouble(document.get("latitude").toString()), Double.parseDouble(document.get("longitude").toString()));
                                     if (distance(latLng, cur_position) < 2.5) {
 
-                                        requester.setLatitude(document.get("Latitude").toString());
-                                        requester.setLongitude(document.get("Longitude").toString());
+                                        requester.setLatitude(document.get("latitude").toString());
+                                        requester.setLongitude(document.get("longitude").toString());
                                         int position = findVolunteer(requester.getUserId());
                                         requester.flag = currFlag1;
 
@@ -665,21 +700,21 @@ public class MapFragment extends Fragment {
                                         else{
                                             Log.d(TAG, "Requester updated: "+document.get("userId").toString());
                                             Marker marker = requester.getMarker();
-                                            marker.setPosition(new LatLng(Double.parseDouble(document.get("Latitude").toString()), Double.parseDouble(document.get("Longitude").toString())));
+                                            marker.setPosition(new LatLng(Double.parseDouble(document.get("latitude").toString()), Double.parseDouble(document.get("longitude").toString())));
                                         }
                                     }
                                     break;
                                 }
                             }
                             if(i == requesterList.size()){
-                                LatLng latLng = new LatLng(Double.parseDouble(document.get("Latitude").toString()), Double.parseDouble(document.get("Longitude").toString()));
+                                LatLng latLng = new LatLng(Double.parseDouble(document.get("latitude").toString()), Double.parseDouble(document.get("longitude").toString()));
                                 if (distance(latLng, cur_position) < 2.5) {
 
                                     Requester requester = new Requester();
                                     requester.setRequestId(document.getId());
                                     requester.setUserId(document.get("userId").toString());
-                                    requester.setLatitude(document.get("Latitude").toString());
-                                    requester.setLongitude(document.get("Longitude").toString());
+                                    requester.setLatitude(document.get("latitude").toString());
+                                    requester.setLongitude(document.get("longitude").toString());
                                     requester.flag = currFlag1;
 
                                     int position = findVolunteer(requester.getUserId());
@@ -734,6 +769,11 @@ public class MapFragment extends Fragment {
 
     public void startRequesterDiscoveryThread(GoogleMap map){
         final GoogleMap myMap = map;
+        try {
+            sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         Log.v(TAG,"(VT)ThreadId1: "+currentThread().getName() + currentThread().getId());
         Thread thread = new Thread(){
             public void run(){

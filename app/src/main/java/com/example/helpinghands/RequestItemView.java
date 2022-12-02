@@ -18,7 +18,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 public class RequestItemView extends Dialog {
 
     RequestItem requestItem;
-    Button okBtn, stopRequest;
+    Button okBtn;
 
     public RequestItemView(@NonNull Context context, RequestItem requestItem) {
         super(context);
@@ -35,29 +35,11 @@ public class RequestItemView extends Dialog {
         ((TextView) findViewById(R.id.itemLatitude)).setText(requestItem.getLatitude());
         ((TextView) findViewById(R.id.itemLongitude)).setText(requestItem.getLongitude());
         ((TextView) findViewById(R.id.itemStatus)).setText(requestItem.getStatus());
-        ((TextView) findViewById(R.id.itemTimestamp)).setText(requestItem.getTimestamp());
+        ((TextView) findViewById(R.id.itemTimestamp)).setText(requestItem.getTimestamp().toDate().toString());
         ((TextView) findViewById(R.id.itemVolunteerNo)).setText(requestItem.getVolunteerNo());
         okBtn = findViewById(R.id.itemOkBtn);
-        stopRequest = findViewById(R.id.itemStopRequest);
         okBtn.setOnClickListener(v -> {
             dismiss();
         });
-        if(!requestItem.getStatus().equals("Active")){ stopRequest.setVisibility(View.GONE); }
-        else {
-            stopRequest.setOnClickListener(v -> {
-                FirebaseFirestore db = FirebaseFirestore.getInstance();
-                db.collection("emergency_requests").document(requestItem.getRequestId()).update("status", "Aborted").addOnCompleteListener(new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        if (task.isSuccessful()) {
-                            dismiss();
-                            Toast.makeText(getContext(), "Request stopped successfully", Toast.LENGTH_SHORT).show();
-                        } else {
-                            Toast.makeText(getContext(), "Error connecting Database", Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                });
-            });
-        }
     }
 }

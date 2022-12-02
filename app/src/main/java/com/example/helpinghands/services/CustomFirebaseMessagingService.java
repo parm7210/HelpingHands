@@ -52,31 +52,25 @@ public class CustomFirebaseMessagingService extends FirebaseMessagingService {
         return (c * r);
     }
 
-    public static void notifyUser(Context context){
+    public static void notifyUser(Context context, String title, String message, String channelName){
 
         Date currentTime = Calendar.getInstance().getTime();
-        /*NavController nc = Navigation.findNavController(myactivity, R.id.nav_host_fragment);
-        PendingIntent pendingIntent = nc.createDeepLink().setDestination(R.id.navigation_map).createPendingIntent();*/
         Intent notifyIntent = new Intent(context, MainActivity.class);
         notifyIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         notifyIntent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
-        notifyIntent.putExtra("FragmentName","RequestFrag");
         PendingIntent notifyPendingIntent = PendingIntent.getActivity(context, 0, notifyIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
-        /*TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);
-        stackBuilder.addNextIntent(notifyIntent);
-        PendingIntent notifyPendingIntent = stackBuilder.getPendingIntent(0,PendingIntent.FLAG_UPDATE_CURRENT);*/
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context,"notify_001")
                 .setSmallIcon(R.drawable.ic_helpinghands)
-                .setContentTitle("Incoming Request")
-                .setContentText("Someone within your area needs your help")
+                .setContentTitle(title)
+                .setContentText(message)
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                 .setContentIntent(notifyPendingIntent);
         NotificationManager nm = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         String channelId = "notify_001";
         NotificationChannel channel = new NotificationChannel(
                 channelId,
-                "Incoming Request Notification",
+                channelName,
                 NotificationManager.IMPORTANCE_HIGH);
         nm.createNotificationChannel(channel);
         builder.setChannelId(channelId);
@@ -112,17 +106,20 @@ public class CustomFirebaseMessagingService extends FirebaseMessagingService {
                     JSONObject jsonObject = new JSONObject(remoteMessage.getData());
                     User user = new User(CustomFirebaseMessagingService.this);
                     try {
-                        if(!jsonObject.getString("userId").equals(user.getUserid())) {
-                            String type = jsonObject.getString("Type");
-                            switch (type) {
-                                case "ERequest":
-                                    LatLng latLng = new LatLng(Double.parseDouble(jsonObject.getString("Latitude")), Double.parseDouble(jsonObject.getString("Longitude")));
+                        String type = jsonObject.getString("Type");
+                        switch (type) {
+                            case "ERequest":
+                                if(!jsonObject.getString("userId").equals(user.getUserid())) {
+                                    LatLng latLng = new LatLng(Double.parseDouble(jsonObject.getString("latitude")), Double.parseDouble(jsonObject.getString("longitude")));
                                     if(distance(latLng, userLatLng) < 2.5){
-                                            notifyUser(getApplicationContext());
+                                            notifyUser(getApplicationContext(), "Incoming Request", "Someone within your area needs your help", "Incoming Request Notification");
                                     }
-                                    Toast.makeText(CustomFirebaseMessagingService.this, "Message data payload: " + jsonObject.toString(), Toast.LENGTH_LONG).show();
-
-                            }
+//                                    Toast.makeText(CustomFirebaseMessagingService.this, "Message data payload: " + jsonObject.toString(), Toast.LENGTH_LONG).show();
+                                }
+                                break;
+                            case "RequestAccept":
+                                myUser.setVolunteerId(jsonObject.getString("vid"));
+                                notifyUser(getApplicationContext(), "Help is coming", "A volunteer in your area has accepted your request", "Incoming Help Notification");
                         }
                     } catch (JSONException e) {
                         e.printStackTrace();

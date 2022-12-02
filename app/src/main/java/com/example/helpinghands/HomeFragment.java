@@ -55,7 +55,6 @@ public class HomeFragment extends Fragment {
     private ImageButton broadcastRequestBtn;
     private final String LOGNAME = "HomeFragment";
     int cntFlag= 0;
-    public static String vid = "initial";
 
     public HomeFragment() {
     }
@@ -157,6 +156,7 @@ public class HomeFragment extends Fragment {
                 } else {
                     Toast.makeText(activity,"Permission Rejected", Toast.LENGTH_SHORT).show();
                 }
+                return;
             }
 
             case 122: {
@@ -192,7 +192,7 @@ public class HomeFragment extends Fragment {
                 requestPermissions(new String[]{Manifest.permission.CALL_PHONE},120);
             }
             else{
-                makeCall("2268996632");
+                makeCall("911");
             }
         });
         sosBtn.setOnCheckedChangeListener((buttonView, isChecked) -> {
@@ -272,13 +272,13 @@ public class HomeFragment extends Fragment {
                 if (!checkInternetStatus(requireContext())) { noInternetConnectionAlert(requireActivity()); }
                 else {
                     final User user = new User(requireActivity());
-                    db.collection("emergency_requests").whereEqualTo("userId",user.getUserid()).whereEqualTo("Status","Active").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    db.collection("emergency_requests").whereEqualTo("userId",user.getUserid()).whereEqualTo("status","Active").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                         @Override
                         public void onComplete(@NonNull Task<QuerySnapshot> task) {
-//                            if(task.getResult().size() > 0){
-//                                Toast.makeText(getActivity(), "Emergency signal is already started.", Toast.LENGTH_SHORT).show();
-//                            }
-//                            else {
+                            if(task.getResult().size() > 0){
+                                Toast.makeText(getActivity(), "Emergency signal is already started." + task.getResult().getDocuments().toString(), Toast.LENGTH_SHORT).show();
+                            }
+                            else {
                                 Map<String, Object> ERequest = new HashMap<>();
                                 ERequest.put("contactNo", user.getContactNumber());
                                 ERequest.put("type", user.getType());
@@ -299,7 +299,7 @@ public class HomeFragment extends Fragment {
                                         Toast.makeText(getActivity(), "Emergency Request Broadcasted", Toast.LENGTH_SHORT).show();
                                     }
                                 });
-//                            }
+                            }
                         }
                     });
 
