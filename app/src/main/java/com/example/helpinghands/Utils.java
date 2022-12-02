@@ -52,7 +52,7 @@ import java.util.Map;
 
 public class Utils{
     private static final String TAG = "Helper Utils";
-    private static final String serverKey = "AAAAaJLZpX0:APA91bGefpRpVCrPFtF0UF3kQu4ZXEdRp-Rqu-H2MzNtHcm5JgL6JEHzo8JuA6FSw5kWm-pdGqAhVfGj1jVDkGOmPxAQ-PtZ6m4H8kduGJ0wIyu2JA1wbIZKBX26bb489aEmC6Nx04gE";
+    private static final String serverKey = "AAAAZEPRIeY:APA91bHx8ZzLLO9X20u0B98WEwPmn0RuYK8DJaMiiAVvqDrQHFgzku9Hn20eWcMY5d6BJHc28cPIpArk7Oy6gfSBzPk5M_8lDb2NYf1T2x2SA5KUN7fLMtGllbl5x0EuxzV8w6oz00HR";
     private static final String fcmUrl = "https://fcm.googleapis.com/fcm/send";
     public static boolean checkInternetStatus(Context context){
         ConnectivityManager cm = (ConnectivityManager)context.getSystemService(Context.CONNECTIVITY_SERVICE);
