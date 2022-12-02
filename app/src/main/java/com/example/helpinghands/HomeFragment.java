@@ -157,6 +157,7 @@ public class HomeFragment extends Fragment {
                 } else {
                     Toast.makeText(activity,"Permission Rejected", Toast.LENGTH_SHORT).show();
                 }
+                return;
             }
 
             case 122: {
@@ -192,7 +193,7 @@ public class HomeFragment extends Fragment {
                 requestPermissions(new String[]{Manifest.permission.CALL_PHONE},120);
             }
             else{
-                makeCall("2268996632");
+                makeCall("911");
             }
         });
         sosBtn.setOnCheckedChangeListener((buttonView, isChecked) -> {
