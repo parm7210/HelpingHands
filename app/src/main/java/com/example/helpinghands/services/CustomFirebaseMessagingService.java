@@ -109,7 +109,7 @@ public class CustomFirebaseMessagingService extends FirebaseMessagingService {
                         String type = jsonObject.getString("Type");
                         switch (type) {
                             case "ERequest":
-                                if(!jsonObject.getString("userId").equals(user.getUserid())) {
+                                if(!jsonObject.getString("userId").equals(user.getUserid()) && user.getType() == 1) {
                                     LatLng latLng = new LatLng(Double.parseDouble(jsonObject.getString("latitude")), Double.parseDouble(jsonObject.getString("longitude")));
                                     if(distance(latLng, userLatLng) < 2.5){
                                             notifyUser(getApplicationContext(), "Incoming Request", "Someone within your area needs your help", "Incoming Request Notification");

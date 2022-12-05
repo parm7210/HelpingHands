@@ -276,8 +276,8 @@ public class HomeFragment extends Fragment {
                         @Override
                         public void onComplete(@NonNull Task<QuerySnapshot> task) {
                             if(task.getResult().size() > 0){
-                                Toast.makeText(getActivity(), "Emergency signal is already started." + task.getResult().getDocuments().toString(), Toast.LENGTH_SHORT).show();
-                            }
+                                Toast.makeText(getActivity(), "Emergency signal is already started.", Toast.LENGTH_SHORT).show();
+                            }   
                             else {
                                 Map<String, Object> ERequest = new HashMap<>();
                                 ERequest.put("contactNo", user.getContactNumber());

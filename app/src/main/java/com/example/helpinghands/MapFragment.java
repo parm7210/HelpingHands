@@ -68,6 +68,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
@@ -228,11 +229,21 @@ public class MapFragment extends Fragment {
 
                                 @Override
                                 public View getInfoContents(Marker marker) {
-                                    if(!marker.getTitle().equals("Volunteer") && !marker.getTitle().equals("You are here") && !marker.getTitle().equals("Assigned Volunteer"))
+                                    if(marker.getTitle().equals("Volunteer") || marker.getTitle().equals("You are here") || marker.getTitle().equals("Assigned Volunteer"))
                                     {
-                                        return prepareInfoView(getActivity());
+                                        return null;
                                     }
-                                    else{return null;}
+                                    else{
+                                        // Marker is of emergency request
+                                        final String title = marker.getTitle();
+                                        String[] arrOfStr = title.split("@", 2);
+                                        if (arrOfStr[1].equals("Active")){
+                                            return prepareInfoView(getActivity());
+                                        }
+                                        else {
+                                            return null;
+                                        }
+                                    }
                                 }
                             });
 
@@ -241,7 +252,7 @@ public class MapFragment extends Fragment {
                                 public void onInfoWindowClick(final Marker marker) {
                                     if(!marker.getTitle().equals("Volunteer") && !marker.getTitle().equals("You are here"))
                                     {
-                                        final String id = marker.getTitle();
+                                        final String id = marker.getTitle().split("@", 2)[0];
                                         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
                                         final String[] token = new String[1];
@@ -267,9 +278,10 @@ public class MapFragment extends Fragment {
                                                                 public void onSuccess(Void unused) {
                                                                 sendFcmNotifications(requireActivity(), token[0], jsonObject);
                                                                 Toast.makeText(getActivity(), "Request Accepted", Toast.LENGTH_SHORT).show();
+                                                                marker.remove();
                                                                 Marker newmarker = mMap.addMarker(new MarkerOptions()
                                                                         .position(marker.getPosition())
-                                                                        .title(marker.getTitle())
+                                                                        .title(id + "@Accepted")
                                                                         .icon(bitmapDescriptorFromVector(myContext, R.drawable.accepted_request)));
 
                                                                 }
@@ -536,9 +548,10 @@ public class MapFragment extends Fragment {
         final LatLng currPosition = position;
         final GoogleMap mMap = map;
         final String userId = myUserId;
+        List<Volunteer> clonedVolunteerList = new ArrayList<>(volunteerList);
         while(getActivity() != null) {
-            if (volunteerList != null) {
-                for (Volunteer volunteer : volunteerList ) {
+            if (clonedVolunteerList != null) {
+                for (Volunteer volunteer : clonedVolunteerList ) {
                     if(currFlag == volunteer.flag) {
                         volunteerList.remove(volunteer);
                         marker = volunteer.marker;
@@ -554,6 +567,7 @@ public class MapFragment extends Fragment {
                     }
                 }
             }
+            clonedVolunteerList = new ArrayList<>(volunteerList);
             db.collection("user_details").whereEqualTo("localeCity", locality).whereEqualTo("type","1").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                 @Override
                 public void onComplete(@NonNull Task<QuerySnapshot> task) {
@@ -625,7 +639,8 @@ public class MapFragment extends Fragment {
         final String userId = myuserId;
         while(getActivity() != null) {
             if (requesterList != null) {
-                for (final Requester requester : requesterList ){
+                List<Requester> clonedRequesterList = new ArrayList<>(requesterList);
+                for (final Requester requester : clonedRequesterList ){
                     if(currFlag1 == requester.flag) {
                         requesterList.remove(requester);
                         final int position = findVolunteer(requester.getUserId());
@@ -651,7 +666,7 @@ public class MapFragment extends Fragment {
                         }
                         else{
                             marker = requester.marker;
-                            if(getActivity()!=null){
+                            if(getActivity()!=null && marker!= null){
                                 getActivity().runOnUiThread(new Runnable() {
                                     @Override
                                     public void run() {
@@ -665,7 +680,7 @@ public class MapFragment extends Fragment {
                 }
             }
 
-            db.collection("emergency_requests").whereEqualTo("localeCity", Locality).whereEqualTo("status","Active").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            db.collection("emergency_requests").whereEqualTo("localeCity", Locality).whereIn("status", Arrays.asList("Active", "Accepted")).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                 @Override
                 public void onComplete(@NonNull Task<QuerySnapshot> task) {
                     if (task.isSuccessful()) {
@@ -673,6 +688,16 @@ public class MapFragment extends Fragment {
                             if (document.get("userId").equals(userId))
                                 continue;
                             int i;
+                            int requestIcon;
+                            String requestType;
+                            if (document.get("status").toString().equals("Active")){
+                                requestIcon = R.drawable.triggered_request;
+                                requestType = "@Active";
+                            }
+                            else {
+                                requestIcon = R.drawable.accepted_request;
+                                requestType = "@Accepted";
+                            }
                             for(i = 0; i < requesterList.size(); i++){
                                 Requester requester = requesterList.get(i);
                                 if(requester.getUserId().equals(document.get("userId"))){
@@ -692,8 +717,8 @@ public class MapFragment extends Fragment {
                                                 volunteerList.get(position).marker.remove();
                                                 volunteerList.get(position).marker = mMap.addMarker(new MarkerOptions()
                                                         .position(latLng)
-                                                        .title(requester.getRequestId())
-                                                        .icon(bitmapDescriptorFromVector(myContext, R.drawable.triggered_request)));
+                                                        .title(requester.getRequestId() + requestType)
+                                                        .icon(bitmapDescriptorFromVector(myContext, requestIcon)));
                                                 //requester.marker = volunteerList.get(position).marker;
                                             }
                                         }
@@ -723,16 +748,16 @@ public class MapFragment extends Fragment {
                                         volunteerList.get(position).marker.remove();
                                         volunteerList.get(position).marker = mMap.addMarker(new MarkerOptions()
                                                 .position(latLng)
-                                                .title(requester.getRequestId())
-                                                .icon(bitmapDescriptorFromVector(myContext, R.drawable.triggered_request)));
+                                                .title(requester.getRequestId() + requestType)
+                                                .icon(bitmapDescriptorFromVector(myContext, requestIcon)));
                                         //requester.marker = volunteerList.get(position).marker;
                                         Log.d(TAG,"Volunteer Requester Added: "+document.get("userId").toString());
                                     }
                                     else{
                                         requester.marker = mMap.addMarker(new MarkerOptions()
                                                 .position(latLng)
-                                                .title(requester.getRequestId())
-                                                .icon(bitmapDescriptorFromVector(myContext, R.drawable.triggered_request)));
+                                                .title(requester.getRequestId() + requestType)
+                                                .icon(bitmapDescriptorFromVector(myContext, requestIcon)));
                                         Log.d(TAG,"Requester Added: "+document.get("userId").toString());
                                     }
                                     requesterList.add(requester);

@@ -11,6 +11,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,10 +23,13 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 public class RequestsFragment extends Fragment {
@@ -58,7 +62,7 @@ public class RequestsFragment extends Fragment {
             TextView loadingText = loadingDialogue.findViewById(R.id.textView7);
             loadingText.setText(R.string.fetching_data_from_database);
             final FirebaseFirestore db = FirebaseFirestore.getInstance();
-            db.collection("emergency_requests").whereEqualTo("userId", user.getUserid()).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            db.collection("emergency_requests").orderBy("created", Query.Direction.DESCENDING).whereEqualTo("userId", user.getUserid()).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                 @Override
                 public void onComplete(@NonNull Task<QuerySnapshot> task) {
                     if (task.isSuccessful()) {
@@ -90,6 +94,7 @@ public class RequestsFragment extends Fragment {
                                                 document1.get("localeCity")+"");
                                         itemList.add(requestItem1);
                                     }
+                                    Collections.sort(itemList, new sortRequestItems());
                                     recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
                                     recyclerView.setAdapter(new RequestListViewAdapter(getContext(), itemList, new RequestListViewAdapter.OnItemClickListener() {
                                         @Override
@@ -106,13 +111,23 @@ public class RequestsFragment extends Fragment {
                         });
                     }
                     else {
-                        Toast.makeText(getActivity(), "Error connecting Database", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getActivity(), "Error connecting Database : ", Toast.LENGTH_SHORT).show();
+                        loadingDialogue.cancel();
+                        Log.e("RequestFragment", task.getException().toString());
                     }
                 }
             });
         }
 
         return root;
+    }
+}
+
+class sortRequestItems implements Comparator<RequestItem>{
+
+    @Override
+    public int compare(RequestItem o1, RequestItem o2) {
+        return o2.timestamp.compareTo(o1.timestamp);
     }
 }
 
