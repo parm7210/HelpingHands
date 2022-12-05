@@ -86,6 +86,10 @@ public class Utils{
         Log.v(TAG,"Setting User location: "+myPosition);
         myUser.setLatitude(Double.toString(myPosition.latitude));
         myUser.setLongitude(Double.toString(myPosition.longitude));
+        if (myUser.getUserid().equals("")){
+            Log.v(TAG, "Found Null user ID");
+            return;
+        }
         db.collection("user_details").document(myUser.getUserid())
                 .update("latitude",myPosition.latitude, "longitude",myPosition.longitude)
                 .addOnFailureListener(e -> {
