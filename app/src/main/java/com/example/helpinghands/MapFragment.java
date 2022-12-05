@@ -278,6 +278,7 @@ public class MapFragment extends Fragment {
                                                                 public void onSuccess(Void unused) {
                                                                 sendFcmNotifications(requireActivity(), token[0], jsonObject);
                                                                 Toast.makeText(getActivity(), "Request Accepted", Toast.LENGTH_SHORT).show();
+
                                                                 marker.remove();
                                                                 Marker newmarker = mMap.addMarker(new MarkerOptions()
                                                                         .position(marker.getPosition())

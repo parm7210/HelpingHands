@@ -19,11 +19,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.ListView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 
@@ -34,6 +36,7 @@ public class ProfileFragment extends Fragment {
     private Activity activity;
     private View promptsViewChangePass;
     private View promptsViewDeleteAccount;
+    private View profileFragmentRoot;
     private EditText oldPass;
     private EditText newPass;
     private EditText deletePass;
@@ -58,14 +61,15 @@ public class ProfileFragment extends Fragment {
         activity = requireActivity();
         LayoutInflater layoutInflater =LayoutInflater.from(getContext());
         user = new User(activity);
+        profileFragmentRoot = root;
         ListView listView = root.findViewById(R.id.profileList);
         final String[] options = new String[]{
                 "My Profile","Emergency Contacts","Change Credentials",
-                "Deactivate Account","Log out","Help & Feedback"};
+                "Deactivate Account","Log out","Help & About"};
         final String[] info = new String[]{
                 "Edit profile details","Manage Emergency Contacts","Change/Forgot password",
                 "Account will be deleted permanently","Session will be destroyed",
-                "FAQs & Feedback option"};
+                "Creators info and Help"};
         final Integer[] imageArray = new Integer[]{
                 R.drawable.baseline_person_24,R.drawable.ic_contacts_24px,
                 R.drawable.ic_security_24px, R.drawable.ic_cancel_24px,
@@ -149,6 +153,18 @@ public class ProfileFragment extends Fragment {
                         builder.show();
                         break;
                     }
+                    case 5:{
+                        final AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+                        builder.setCancelable(true);
+                        promptsViewChangePass = layoutInflater.inflate(
+                                R.layout.help_dialogue, null);
+                        builder.setView(promptsViewChangePass);
+                        builder.setPositiveButton("got it", (dialog, which) -> {
+                            dialog.dismiss();
+                        });
+                        builder.show();
+                        break;
+                    }
                 }
             }
         });
@@ -216,11 +232,11 @@ public class ProfileFragment extends Fragment {
                         if(task.isSuccessful()){
                             Log.v("status","Success");
                             user.setPassword(newPass.getText().toString());
-                            Toast.makeText(getActivity(),"Password is changed successfully",Toast.LENGTH_SHORT).show();
+                            Snackbar.make(profileFragmentRoot, "Password is changed successfully", Snackbar.LENGTH_LONG).show();
                             progressBar.dismiss();
                         }
                         else{
-                            Toast.makeText(getActivity(),"Error while performing action",Toast.LENGTH_SHORT).show();
+                            Snackbar.make(profileFragmentRoot, "Error while performing action", Snackbar.LENGTH_LONG).show();
                             progressBar.dismiss();
                         }
                     });
