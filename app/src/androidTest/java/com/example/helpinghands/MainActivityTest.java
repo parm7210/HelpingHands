@@ -2,11 +2,19 @@ package com.example.helpinghands;
 
 
 import static androidx.test.espresso.Espresso.onView;
-import static androidx.test.espresso.action.ViewActions.*;
-import static androidx.test.espresso.assertion.ViewAssertions.*;
-import static androidx.test.espresso.matcher.ViewMatchers.*;
+import static androidx.test.espresso.action.ViewActions.click;
+import static androidx.test.espresso.action.ViewActions.closeSoftKeyboard;
+import static androidx.test.espresso.action.ViewActions.replaceText;
+import static androidx.test.espresso.action.ViewActions.scrollTo;
+import static androidx.test.espresso.assertion.ViewAssertions.matches;
+import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
+import static androidx.test.espresso.matcher.ViewMatchers.withClassName;
+import static androidx.test.espresso.matcher.ViewMatchers.withContentDescription;
+import static androidx.test.espresso.matcher.ViewMatchers.withId;
+import static androidx.test.espresso.matcher.ViewMatchers.withParent;
+import static androidx.test.espresso.matcher.ViewMatchers.withText;
+import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.is;
-import static org.hamcrest.core.AllOf.allOf;
 
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,16 +29,13 @@ import androidx.test.rule.GrantPermissionRule;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
-import org.junit.FixMethodOrder;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.junit.runners.MethodSorters;
 
 @LargeTest
 @RunWith(AndroidJUnit4.class)
-@FixMethodOrder(MethodSorters.NAME_ASCENDING)
-public class LoginTest {
+public class MainActivityTest {
 
     @Rule
     public ActivityScenarioRule<SplashActivity> mActivityScenarioRule =
@@ -42,36 +47,38 @@ public class LoginTest {
                     "android.permission.ACCESS_FINE_LOCATION");
 
     @Test
-    public void a_loginTest() {
-        ViewInteraction appCompatEditText = onView(
-                allOf(withId(R.id.loginMobileNo),
-                        childAtPosition(
-                                allOf(withId(R.id.constraintLayout),
-                                        childAtPosition(
-                                                withClassName(is("android.widget.ScrollView")),
-                                                0)),
-                                3)));
-        appCompatEditText.perform(scrollTo(), replaceText("2268996687"), closeSoftKeyboard());
+    public void mainActivityTest() {
 
-        ViewInteraction appCompatEditText2 = onView(
-                allOf(withId(R.id.loginPassword),
+        ViewInteraction appCompatImageButton = onView(
+                allOf(withId(R.id.broadcastRequestBtn),
                         childAtPosition(
-                                allOf(withId(R.id.constraintLayout),
+                                allOf(withId(R.id.constraintLayout01),
                                         childAtPosition(
                                                 withClassName(is("android.widget.ScrollView")),
                                                 0)),
-                                4)));
-        appCompatEditText2.perform(scrollTo(), replaceText("abcd1234"), closeSoftKeyboard());
+                                7)));
+        appCompatImageButton.perform(scrollTo(), click());
 
-        ViewInteraction materialButton = onView(
-                allOf(withId(R.id.loginButton), withText("Login"),
+        ViewInteraction bottomNavigationItemView = onView(
+                allOf(withId(R.id.requestsFragment), withContentDescription("Requests"),
                         childAtPosition(
-                                allOf(withId(R.id.constraintLayout),
-                                        childAtPosition(
-                                                withClassName(is("android.widget.ScrollView")),
-                                                0)),
-                                0)));
-        materialButton.perform(scrollTo(), click());
+                                childAtPosition(
+                                        withId(R.id.bottomNavigationView),
+                                        0),
+                                2),
+                        isDisplayed()));
+        bottomNavigationItemView.perform(click());
+        try {
+            Thread.sleep(3000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        ViewInteraction textView = onView(
+                allOf(withId(R.id.status), withText("Active"),
+                        withParent(withParent(withId(R.id.recyclerView))),
+                        isDisplayed()));
+        textView.check(matches(withText("Active")));
     }
 
     private static Matcher<View> childAtPosition(
