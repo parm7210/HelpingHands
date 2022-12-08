@@ -36,6 +36,7 @@ import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 
+import android.provider.Settings;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -190,7 +191,7 @@ public class MapFragment extends Fragment {
         myContext = getActivity();
         final ProgressDialog progressBar1;
         progressBar1 = new ProgressDialog(getContext());
-        progressBar1.setMessage("Finding current location...");
+        progressBar1.setMessage(getString(R.string.Finding_current_location));
         progressBar1.setProgressStyle(ProgressDialog.STYLE_SPINNER);
         progressBar1.setCancelable(true);
         progressBar1.setOnCancelListener(new DialogInterface.OnCancelListener() {
@@ -229,7 +230,7 @@ public class MapFragment extends Fragment {
 
                                 @Override
                                 public View getInfoContents(Marker marker) {
-                                    if(marker.getTitle().equals("Volunteer") || marker.getTitle().equals("You are here") || marker.getTitle().equals("Assigned Volunteer"))
+                                    if(marker.getTitle().equals("Volunteer") || marker.getTitle().equals(getString(R.string.You_are_here)) || marker.getTitle().equals(getString(R.string.Assigned_Volunteer)))
                                     {
                                         return null;
                                     }
@@ -250,7 +251,7 @@ public class MapFragment extends Fragment {
                             mMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
                                 @Override
                                 public void onInfoWindowClick(final Marker marker) {
-                                    if(!marker.getTitle().equals("Volunteer") && !marker.getTitle().equals("You are here"))
+                                    if(!marker.getTitle().equals(getString(R.string.Volunteer)) && !marker.getTitle().equals(getString(R.string.You_are_here)))
                                     {
                                         final String id = marker.getTitle().split("@", 2)[0];
                                         FirebaseFirestore db = FirebaseFirestore.getInstance();
@@ -289,7 +290,7 @@ public class MapFragment extends Fragment {
                                                             });
                                                         }
                                                         else {
-                                                            Toast.makeText(getActivity(), "Error connecting to database", Toast.LENGTH_SHORT).show();
+                                                            Toast.makeText(getActivity(), R.string.Error_connecting_to_database, Toast.LENGTH_SHORT).show();
                                                         }
                                                     }
 
@@ -455,7 +456,7 @@ public class MapFragment extends Fragment {
     public Marker setMarker(GoogleMap map, LatLng my_position){
         Marker location_marker = map.addMarker(new MarkerOptions()
                 .position(my_position)
-                .title("You are here")
+                .title(getString(R.string.You_are_here))
                 .icon(bitmapDescriptorFromVector(getActivity(), R.drawable.baseline_location_on_24)));
         return location_marker;
     }
@@ -479,6 +480,10 @@ public class MapFragment extends Fragment {
         Log.v(TAG,"Setting User location: "+my_position);
         myUser.setLatitude(Double.toString(my_position.latitude));
         myUser.setLongitude(Double.toString(my_position.longitude));
+        if (myUser.getUserid().equals("")){
+            Log.v(TAG, "Found Null user ID");
+            return;
+        }
         db.collection("user_details").document(myUser.getUserid()).update("latitude",my_position.latitude, "longitude",my_position.longitude).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception e) {
@@ -503,14 +508,14 @@ public class MapFragment extends Fragment {
 
     public void gpsDisabledAlert(){
         final AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-        builder.setMessage("GPS service is disabled. You need to enable GPS location to access the map.")
+        builder.setMessage(R.string.GPS_service_is_disabled)
                 .setCancelable(false)
-                .setPositiveButton("Turn on GPS", new DialogInterface.OnClickListener() {
+                .setPositiveButton(R.string.Turn_on_GPS, new DialogInterface.OnClickListener() {
                     public void onClick(@SuppressWarnings("unused") final DialogInterface dialog, @SuppressWarnings("unused") final int id) {
-                        startActivity(new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS));
+                        startActivity(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS));
                     }
                 })
-                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                .setNegativeButton(R.string.Cancel, new DialogInterface.OnClickListener() {
                     public void onClick(final DialogInterface dialog, @SuppressWarnings("unused") final int id) {
                         dialog.cancel();
                     }
@@ -522,9 +527,9 @@ public class MapFragment extends Fragment {
     public void internetDisabledAlert(){
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setCancelable(false);
-        builder.setTitle("No Internet Connection");
-        builder.setMessage("Internet Connection is required to perform the following task.");
-        builder.setNegativeButton("Ok", new DialogInterface.OnClickListener() {
+        builder.setTitle(R.string.No_Internet_Connection);
+        builder.setMessage(R.string.Internet_Connection_is_required);
+        builder.setNegativeButton(R.string.Ok, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 Intent intent = new Intent(getContext(), MainActivity.class);
@@ -605,13 +610,13 @@ public class MapFragment extends Fragment {
                                     if(user.getVolunteerId().equals(document.getId()) ){
                                         volunteer.marker = mMap.addMarker(new MarkerOptions()
                                                 .position(latLng)
-                                                .title("Assigned Volunteer")
+                                                .title(getString(R.string.Assigned_Volunteer))
                                                 .icon(bitmapDescriptorFromVector(myContext, R.drawable.assigned_volunteer)));
                                     }
                                     else{
                                         volunteer.marker = mMap.addMarker(new MarkerOptions()
                                                 .position(latLng)
-                                                .title("Volunteer")
+                                                .title(getString(R.string.Volunteer))
                                                 .icon(bitmapDescriptorFromVector(myContext, R.drawable.baseline_volunteer_location_on_24)));
                                     }
                                     volunteerList.add(volunteer);
@@ -621,7 +626,7 @@ public class MapFragment extends Fragment {
                             }
                         }
                     } else {
-                        Log.v(TAG, "Database Error in fetching");
+                        Log.v(TAG, getString(R.string.Database_Error_in_fetching));
                     }
                 }
             });
@@ -658,7 +663,7 @@ public class MapFragment extends Fragment {
                                             volunteerList.get(position).setUsertype("volunteer");
                                             volunteerList.get(position).marker = mMap.addMarker(new MarkerOptions()
                                                     .position(latlng)
-                                                    .title("Volunteer")
+                                                    .title(getString(R.string.Volunteer))
                                                     .icon(bitmapDescriptorFromVector(myContext, R.drawable.baseline_volunteer_location_on_24)));
                                         }
                                     }

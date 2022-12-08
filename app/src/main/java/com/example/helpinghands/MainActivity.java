@@ -2,7 +2,6 @@ package com.example.helpinghands;
 
 import static com.example.helpinghands.Utils.checkInternetStatus;
 import static com.example.helpinghands.Utils.findLocality;
-import static com.example.helpinghands.Utils.isBGServiceRunning;
 import static com.example.helpinghands.Utils.locationFetch;
 import static com.example.helpinghands.Utils.setUserLocation;
 import static com.example.helpinghands.Utils.updateLocality;

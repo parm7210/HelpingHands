@@ -56,8 +56,8 @@ public class EmergencyContactsActivity extends AppCompatActivity {
         contact3 = findViewById(R.id.eCon3Num);
         button = findViewById(R.id.eConSave);
         String options[] = new String[]{
-                "Parent", "Child", "Sibling", "Husband/Wife","Relative",
-                "Neighbour", "Friend", "Other"};
+                getString(R.string.parent), getString(R.string.child), getString(R.string.sibling), getString(R.string.Husband_Wife),getString(R.string.Relative),
+                getString(R.string.Neighbour), getString(R.string.Friend), getString(R.string.Other)};
         ArrayAdapter adapter = new ArrayAdapter(
                 this, android.R.layout.simple_spinner_item, options);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -89,7 +89,7 @@ public class EmergencyContactsActivity extends AppCompatActivity {
             for (EditText name: names){
                 if(name.getText().toString().length() == 0){
                     name.requestFocus();
-                    name.setError("Name is required");
+                    name.setError(getString(R.string.Name_is_required));
                     validation = false;
                 }
             }
@@ -97,7 +97,7 @@ public class EmergencyContactsActivity extends AppCompatActivity {
             for (EditText contact: contacts){
                 if(!contact.getText().toString().matches("[0-9]{10}")){
                     contact.requestFocus();
-                    contact.setError("Contact number is required");
+                    contact.setError(getString(R.string.Contact_number_is_required));
                     validation = false;
                 }
             }
@@ -146,7 +146,7 @@ public class EmergencyContactsActivity extends AppCompatActivity {
                     user.setRel3(choice3.getSelectedItem().toString());
                     Toast.makeText(
                             EmergencyContactsActivity.this,
-                            "EMERGENCY CONTACTS UPDATED SUCCESSFULLY",
+                            getString(R.string.EMERGENCY_CONTACTS_UPDATED_SUCCESSFULLY),
                             Toast.LENGTH_SHORT).show();
                 }
             }

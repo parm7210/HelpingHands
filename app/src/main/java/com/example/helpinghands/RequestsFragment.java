@@ -84,7 +84,7 @@ public class RequestsFragment extends Fragment {
                                 if (task1.isSuccessful()) {
                                     for (QueryDocumentSnapshot document1 : task1.getResult()) {
                                         RequestItem requestItem1 = new RequestItem(
-                                                "Help provided",
+                                                getString(R.string.Help_provided),
                                                 document1.getId(),
                                                 (Timestamp) document1.get("created"),
                                                 document1.get("latitude")+"",
@@ -111,7 +111,7 @@ public class RequestsFragment extends Fragment {
                         });
                     }
                     else {
-                        Toast.makeText(getActivity(), "Error connecting Database : ", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getActivity(), R.string.Error_connecting_Database, Toast.LENGTH_SHORT).show();
                         loadingDialogue.cancel();
                         Log.e("RequestFragment", task.getException().toString());
                     }
@@ -285,10 +285,10 @@ class RequestListViewAdapter extends RecyclerView.Adapter<RequestListViewHolder>
                                 holder.status.setText("Resolved");
                                 User user = new User(context);
                                 user.setVolunteerId("");
-                                Toast.makeText(context, "Request stopped successfully", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(context, R.string.Request_stopped_successfully, Toast.LENGTH_SHORT).show();
                             }
                             else{
-                                Toast.makeText(context, "Error connecting Database", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(context, R.string.Error_connecting_Database, Toast.LENGTH_SHORT).show();
                             }
                         }
                     });

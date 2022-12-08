@@ -66,7 +66,7 @@ public class HomeFragment extends Fragment {
 
     public void alertContacts(User user) {
         int flag = 0;
-        String message = "Emergency Alert\n"+user.getFName()+" "+user.getLName()+" has just triggered an emergency call. You are receiving this as "+user.getFName()+" has listed you as an emergency contact.";
+        String message = getString(R.string.Emergency_Alert)+user.getFName()+" "+user.getLName()+getString(R.string.triggered_an_emergency_call)+user.getFName()+getString(R.string.listed_you_as_an_emergency_contact);
         Log.v(LOGNAME,"Sending emergency message: " + message);
         String lastLocation = "";
         Log.v(LOGNAME,"User LATLNG " + user.getLatitude());
@@ -74,7 +74,7 @@ public class HomeFragment extends Fragment {
             flag = 1;
             //https://www.google.com/maps/@43.44395,-80.5214339,18z
             //https://www.google.com/maps/?q=43.44395,-80.5214339
-            lastLocation = "Last known location of "+user.getFName()+":\n";
+            lastLocation = getString(R.string.Last_known_location_of)+user.getFName()+":\n";
             lastLocation = lastLocation + "https://www.google.com/maps/?q="+user.getLatitude()+","+user.getLongitude();
             Log.v(LOGNAME, "Message sent: " + lastLocation);
         }
@@ -96,7 +96,7 @@ public class HomeFragment extends Fragment {
             Log.v("status","Message sent to "+user.getEcon3());
             if(flag == 1){sendSMS(user.getEcon3().toString(),lastLocation);}
         }
-        Toast.makeText(getActivity(),"Emergency contacts have been notified via text message",Toast.LENGTH_SHORT).show();
+        Toast.makeText(getActivity(), R.string.Emergency_contacts_have_been_notified_via_text_message,Toast.LENGTH_SHORT).show();
     }
 
     public void initiateEmergency(User user){
@@ -116,7 +116,7 @@ public class HomeFragment extends Fragment {
                     @Override
                     public void onFinish() {
                         if(currUser.getLatitude() != "" && currUser.getLongitude() != ""){
-                            String lastLocation = "Last Known Location is in this area :\n";
+                            String lastLocation = getString(R.string.Last_Known_Location_is_in_this_area);
                             lastLocation = lastLocation + "https://www.google.com/maps/q?"+currUser.getLatitude()+","+currUser.getLongitude();
                             Log.v(LOGNAME,"Sending Message = "+lastLocation);
                             if(currUser.getEcon1()!=0){sendSMS(currUser.getEcon1().toString(),lastLocation);}
@@ -151,10 +151,10 @@ public class HomeFragment extends Fragment {
             case 120: {
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    Toast.makeText(activity,"Permission Granted", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(activity, R.string.Permission_Granted, Toast.LENGTH_SHORT).show();
                     e911Btn.callOnClick();
                 } else {
-                    Toast.makeText(activity,"Permission Rejected", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(activity, R.string.Permission_Rejected, Toast.LENGTH_SHORT).show();
                 }
                 return;
             }
@@ -164,11 +164,11 @@ public class HomeFragment extends Fragment {
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     Log.v(LOGNAME,"SMS Permission provided.");
                     sosBtn.setChecked(false);
-                    Toast.makeText(getActivity(),"SMS Permission provided. You can trigger emergency alert now.",Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getActivity(), R.string.SMS_Permission_provided,Toast.LENGTH_SHORT).show();
                 } else {
                     Log.v(LOGNAME,"SMS Permission rejected.");
                     sosBtn.setChecked(false);
-                    Toast.makeText(getActivity(),"SMS permission is not provided yet.",Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getActivity(), R.string.SMS_permission_is_not_provided_yet,Toast.LENGTH_SHORT).show();
                 }
                 return;
             }
@@ -206,15 +206,15 @@ public class HomeFragment extends Fragment {
                         sosBtn.setChecked(false);
                         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
                         builder.setCancelable(true);
-                        builder.setTitle("Emergency contacts not found");
-                        builder.setMessage("Emergency contacts have not been provided yet! Do you want to add Emergency contacts?");
-                        builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                        builder.setTitle(R.string.Emergency_contacts_not_found);
+                        builder.setMessage(R.string.Emergency_contacts_have_not_been_provided_yet);
+                        builder.setNegativeButton(R.string.No, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 dialog.cancel();
                             }
                         });
-                        builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                        builder.setPositiveButton(R.string.Yes, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 Intent intent = new Intent(getContext(), EmergencyContactsActivity.class);
@@ -226,7 +226,7 @@ public class HomeFragment extends Fragment {
                     }
                     else{
                         final AlertDialog.Builder dialog = new AlertDialog.Builder(getActivity())
-                                .setTitle("Sending Emergency Message").setMessage("Waiting...").setCancelable(false);
+                                .setTitle(R.string.Sending_Emergency_Message).setMessage(R.string.Waiting).setCancelable(false);
                         dialog.setNegativeButton("Cancel",
                                 new DialogInterface.OnClickListener() {
                                     @Override
@@ -241,12 +241,12 @@ public class HomeFragment extends Fragment {
                             @Override
                             public void onTick(long millisUntilFinished) {
                                 Log.v("status",(int)((millisUntilFinished+1000)/1000)+"");
-                                alert.setMessage("Alerting Emergency Contacts via text message in "+(int)((millisUntilFinished+1000)/1000)+" sec...");
+                                alert.setMessage(getString(R.string.Alerting_Emergency_Contacts_via_text_message)+(int)((millisUntilFinished+1000)/1000)+getString(R.string.sec));
                                 if(cntFlag == 1){
                                     cntFlag=0;
                                     this.cancel();
                                     sosBtn.setChecked(false);
-                                    Toast.makeText(getActivity(),"SOS Alert is stopped",Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(getActivity(), R.string.SOS_Alert_is_stopped,Toast.LENGTH_SHORT).show();
                                 }
                             }
                             @Override
@@ -263,7 +263,7 @@ public class HomeFragment extends Fragment {
             }
             else{
                 Log.v(LOGNAME,"SOS Alert is stopped");
-                Toast.makeText(getActivity(),"SOS Alert is stopped",Toast.LENGTH_SHORT).show();
+                Toast.makeText(getActivity(),R.string.SOS_Alert_is_stopped,Toast.LENGTH_SHORT).show();
                 user.setSOSflag(0);
             }
         });
@@ -276,7 +276,7 @@ public class HomeFragment extends Fragment {
                         @Override
                         public void onComplete(@NonNull Task<QuerySnapshot> task) {
                             if(task.getResult().size() > 0){
-                                Toast.makeText(getActivity(), "Emergency signal is already started.", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(getActivity(), R.string.Emergency_signal_is_already_started, Toast.LENGTH_SHORT).show();
                             }   
                             else {
                                 Map<String, Object> ERequest = new HashMap<>();
@@ -296,7 +296,7 @@ public class HomeFragment extends Fragment {
                                         ERequest.put("Type", "ERequest");
                                         JSONObject jsonObject = new JSONObject(ERequest);
                                         sendFcmNotifications(requireActivity(), "/topics/"+user.getLocaleCity(), jsonObject);
-                                        Toast.makeText(getActivity(), "Emergency Request Broadcasted", Toast.LENGTH_SHORT).show();
+                                        Toast.makeText(getActivity(), R.string.Emergency_Request_Broadcasted, Toast.LENGTH_SHORT).show();
                                     }
                                 });
                             }

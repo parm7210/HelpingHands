@@ -64,12 +64,12 @@ public class ProfileFragment extends Fragment {
         profileFragmentRoot = root;
         ListView listView = root.findViewById(R.id.profileList);
         final String[] options = new String[]{
-                "My Profile","Emergency Contacts","Change Credentials",
-                "Deactivate Account","Log out","Help & About"};
+                getString(R.string.My_Profile),getString(R.string.Emergency_Contacts),getString(R.string.Change_Credentials),
+                getString(R.string.Deactivate_Account),getString(R.string.Log_out),getString(R.string.Help_About)};
         final String[] info = new String[]{
-                "Edit profile details","Manage Emergency Contacts","Change/Forgot password",
-                "Account will be deleted permanently","Session will be destroyed",
-                "Creators info and Help"};
+                getString(R.string.Edit_profile_details),getString(R.string.Manage_Emergency_Contacts),getString(R.string.Change_Forgot_password),
+                getString(R.string.Account_deleted_permanently),getString(R.string.Session_destroyed),
+                getString(R.string.Creators_info_and_Help)};
         final Integer[] imageArray = new Integer[]{
                 R.drawable.baseline_person_24,R.drawable.ic_contacts_24px,
                 R.drawable.ic_security_24px, R.drawable.ic_cancel_24px,
@@ -102,14 +102,14 @@ public class ProfileFragment extends Fragment {
                     case 2:{
                         final AlertDialog.Builder builder = new AlertDialog.Builder(activity);
                         builder.setCancelable(true);
-                        builder.setTitle("Change Account Password");
+                        builder.setTitle(R.string.Change_Account_Password);
                         promptsViewChangePass = layoutInflater.inflate(
                                 R.layout.dialog_reset_pass, null);
                         builder.setView(promptsViewChangePass);
                         oldPass = promptsViewChangePass.findViewById(R.id.oldPass);
                         newPass = promptsViewChangePass.findViewById(R.id.newPass);
-                        builder.setNegativeButton("cancel", (dialog, which) -> {});
-                        builder.setPositiveButton("Change password", (dialog, which) -> {
+                        builder.setNegativeButton(R.string.cancel, (dialog, which) -> {});
+                        builder.setPositiveButton(R.string.Change_password, (dialog, which) -> {
                             changePassword();
                         });
                         builder.show();
@@ -118,18 +118,17 @@ public class ProfileFragment extends Fragment {
                     case 3:{
                         final AlertDialog.Builder builder = new AlertDialog.Builder(activity);
                         builder.setCancelable(true);
-                        builder.setTitle("Deactivate Account");
+                        builder.setTitle(getString(R.string.Deactivate_Account));
                         builder.setMessage(
-                            "This will delete your account along with all your data. " +
-                            "This can't be undone");
+                            R.string.This_will_delete_your_account);
 
                         promptsViewDeleteAccount = layoutInflater.inflate(
                                 R.layout.dialog_format, null);
                         builder.setView(promptsViewDeleteAccount);
                         deletePass = promptsViewDeleteAccount.findViewById(R.id.passFormat);
 
-                        builder.setNegativeButton("cancel", (dialog, which) -> {});
-                        builder.setPositiveButton("Deactivate my Account", (dialog, which) -> {
+                        builder.setNegativeButton(getString(R.string.cancel), (dialog, which) -> {});
+                        builder.setPositiveButton(R.string.Deactivate_my_Account, (dialog, which) -> {
                             deleteAccount();
                         });
                         builder.show();
@@ -139,10 +138,10 @@ public class ProfileFragment extends Fragment {
                     case 4:{
                         AlertDialog.Builder builder = new AlertDialog.Builder(activity);
                         builder.setCancelable(true);
-                        builder.setTitle("Logout");
-                        builder.setMessage("Are you sure you want to log out?");
-                        builder.setNegativeButton("cancel", (dialog, which) -> {});
-                        builder.setPositiveButton("Log out", (dialog, which) -> {
+                        builder.setTitle(R.string.Logout);
+                        builder.setMessage(R.string.Are_you_sure_you_want_to_log_out);
+                        builder.setNegativeButton(getString(R.string.cancel), (dialog, which) -> {});
+                        builder.setPositiveButton(getString(R.string.Log_out), (dialog, which) -> {
                             user.removeUser();
                             Intent in = new Intent(activity, LoginActivity.class);
                             startActivity(in);
@@ -159,7 +158,7 @@ public class ProfileFragment extends Fragment {
                         promptsViewChangePass = layoutInflater.inflate(
                                 R.layout.help_dialogue, null);
                         builder.setView(promptsViewChangePass);
-                        builder.setPositiveButton("got it", (dialog, which) -> {
+                        builder.setPositiveButton(R.string.got_it, (dialog, which) -> {
                             dialog.dismiss();
                         });
                         builder.show();
@@ -182,7 +181,7 @@ public class ProfileFragment extends Fragment {
                 final ProgressDialog progressBar;
                 progressBar = new ProgressDialog(promptsViewDeleteAccount.getContext());
                 progressBar.setCancelable(false);
-                progressBar.setMessage("Deleting Account Data...");
+                progressBar.setMessage(getString(R.string.Deleting_Account_Data));
                 progressBar.setProgressStyle(ProgressDialog.STYLE_SPINNER);
                 progressBar.setProgress(0);
                 progressBar.setMax(100);
@@ -191,14 +190,14 @@ public class ProfileFragment extends Fragment {
                     if(task.isSuccessful()){
                         Log.v("status","Success user_details");
                         user.removeUser();
-                        Toast.makeText(getActivity(),"Account deactivated successfully",Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getActivity(), R.string.Account_deactivated_successfully,Toast.LENGTH_SHORT).show();
                         progressBar.dismiss();
                         Intent in = new Intent(activity, LoginActivity.class);
                         startActivity(in);
                         activity.overridePendingTransition(R.anim.slide_in_left,R.anim.slide_out_right);
                     }
                     else{
-                        Toast.makeText(getActivity(),"Error while performing action",Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getActivity(), R.string.Error_while_performing_action,Toast.LENGTH_SHORT).show();
                         progressBar.dismiss();
                     }
                 });
@@ -206,7 +205,7 @@ public class ProfileFragment extends Fragment {
 
             }
             else{
-                Toast.makeText(getActivity(),"Password does not match",Toast.LENGTH_SHORT).show();
+                Toast.makeText(getActivity(), R.string.Password_does_not_match,Toast.LENGTH_SHORT).show();
             }}
     }
 
@@ -216,14 +215,14 @@ public class ProfileFragment extends Fragment {
         }
         else{
             if(!newPass.getText().toString().matches("[a-zA-Z0-9@#$.]{5}[a-zA-Z0-9@#$.]+")){
-                Toast.makeText(getActivity(),"New Password must be 6 characters long",Toast.LENGTH_SHORT).show();
+                Toast.makeText(getActivity(), R.string.NewPassword_must_be_6_characters_long,Toast.LENGTH_SHORT).show();
             }
             else{
                 if(oldPass.getText().toString().equals(user.getPassword())){
                     final ProgressDialog progressBar;
                     progressBar = new ProgressDialog(promptsViewChangePass.getContext());
                     progressBar.setCancelable(false);
-                    progressBar.setMessage("Updating New password...");
+                    progressBar.setMessage(getString(R.string.Updating_New_password));
                     progressBar.setProgressStyle(ProgressDialog.STYLE_SPINNER);
                     progressBar.setProgress(0);
                     progressBar.setMax(100);
@@ -232,17 +231,17 @@ public class ProfileFragment extends Fragment {
                         if(task.isSuccessful()){
                             Log.v("status","Success");
                             user.setPassword(newPass.getText().toString());
-                            Snackbar.make(profileFragmentRoot, "Password is changed successfully", Snackbar.LENGTH_LONG).show();
+                            Snackbar.make(profileFragmentRoot, R.string.Password_is_changed_successfully, Snackbar.LENGTH_LONG).show();
                             progressBar.dismiss();
                         }
                         else{
-                            Snackbar.make(profileFragmentRoot, "Error while performing action", Snackbar.LENGTH_LONG).show();
+                            Snackbar.make(profileFragmentRoot, getString(R.string.Error_while_performing_action), Snackbar.LENGTH_LONG).show();
                             progressBar.dismiss();
                         }
                     });
                 }
                 else{
-                    Toast.makeText(getActivity(),"Password does not match",Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getActivity(),R.string.Password_does_not_match,Toast.LENGTH_SHORT).show();
                 }}
         }
     }

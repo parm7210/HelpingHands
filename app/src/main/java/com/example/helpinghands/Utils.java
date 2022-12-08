@@ -63,10 +63,9 @@ public class Utils{
     public static void noInternetConnectionAlert(Context context){
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         builder.setCancelable(true);
-        builder.setTitle("No Internet Connection");
-        builder.setMessage(
-                "Internet Connection is required to perform this task.");
-        builder.setNegativeButton("Ok", (dialog, which) -> {});
+        builder.setTitle(context.getString(R.string.No_Internet_Connection));
+        builder.setMessage(context.getString(R.string.Internet_Connection_is_required));
+        builder.setNegativeButton(context.getString(R.string.Ok), (dialog, which) -> {});
         builder.show();
     }
 
@@ -93,7 +92,7 @@ public class Utils{
         db.collection("user_details").document(myUser.getUserid())
                 .update("latitude",myPosition.latitude, "longitude",myPosition.longitude)
                 .addOnFailureListener(e -> {
-                    Toast.makeText(activity, "Error updating location in the database.", Toast.LENGTH_LONG).show();
+                    Toast.makeText(activity, R.string.Error_updating_location_in_the_database, Toast.LENGTH_LONG).show();
         });
     }
 
@@ -148,18 +147,6 @@ public class Utils{
                 "localeCity",myAddress.getLocality());
     }
 
-    static boolean isBGServiceRunning(Activity activity, Class<?> serviceClass) {
-        ActivityManager manager = (ActivityManager) activity.getSystemService(Context.ACTIVITY_SERVICE);
-        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
-            if (serviceClass.getName().equals(service.service.getClassName())) {
-                Log.i ("isBGServiceRunning", "true");
-                return true;
-            }
-        }
-        Log.i ("isBGServiceRunning", "false");
-        return false;
-    }
-
     static void sendFcmNotifications(
             Activity activity, String receiver, JSONObject jsonNotification){
         RequestQueue requestQueue = Volley.newRequestQueue(activity);
@@ -170,12 +157,12 @@ public class Utils{
             JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST, fcmUrl, jsonObject, new Response.Listener<JSONObject>() {
                 @Override
                 public void onResponse(JSONObject response) {
-                    Toast.makeText(activity, "Success sending notification: "+ response, Toast.LENGTH_LONG).show();
+                    Toast.makeText(activity, activity.getString(R.string.Success_sending_notification)+ response, Toast.LENGTH_LONG).show();
                 }
             }, new Response.ErrorListener() {
                 @Override
                 public void onErrorResponse(VolleyError error) {
-                    Toast.makeText(activity, "Error sending notification: "+ error, Toast.LENGTH_LONG).show();
+                    Toast.makeText(activity, activity.getString(R.string.Error_sending_notification)+ error, Toast.LENGTH_LONG).show();
                 }
             }) {
                 @Override

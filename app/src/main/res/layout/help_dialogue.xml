@@ -22,7 +22,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
-                android:text="Malay Patel"
+                android:text="@string/malay_patel"
                 app:layout_constraintStart_toStartOf="@+id/itemCity3"
                 app:layout_constraintTop_toBottomOf="@+id/itemCity3" />
 
@@ -31,7 +31,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
-                android:text="Kishan Patel"
+                android:text="@string/kishan_patel"
                 app:layout_constraintStart_toStartOf="@+id/itemCity4"
                 app:layout_constraintTop_toBottomOf="@+id/itemCity4" />
 
@@ -40,7 +40,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
-                android:text="Smit Panchal"
+                android:text="@string/smit_panchal"
                 app:layout_constraintStart_toStartOf="@+id/itemCity5"
                 app:layout_constraintTop_toBottomOf="@+id/itemCity5" />
 
@@ -50,7 +50,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="40dp"
                 android:layout_marginTop="8dp"
-                android:text="Rushi Parmar"
+                android:text="@string/rushi_parmar"
                 app:layout_constraintStart_toStartOf="@+id/textView19"
                 app:layout_constraintTop_toBottomOf="@+id/textView19" />
 
@@ -59,7 +59,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:text="Helping Hands, Version 1.1.0.0"
+                android:text="@string/helping_hands_version_1_1_0_0"
                 app:layout_constraintStart_toStartOf="@+id/itemCity6"
                 app:layout_constraintTop_toBottomOf="@+id/textView20" />
 
@@ -68,7 +68,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:text="Home Page :"
+                android:text="@string/home_page"
                 android:textColor="@color/colorPrimary"
                 app:layout_constraintStart_toStartOf="@+id/textView20"
                 app:layout_constraintTop_toBottomOf="@+id/textView21" />
@@ -80,7 +80,7 @@
                 android:layout_marginStart="30dp"
                 android:layout_marginTop="2dp"
                 android:layout_marginEnd="30dp"
-                android:text="You can call 911, text your emergency contacts or broadcast an emergency signal to nearby volunteers using the home page."
+                android:text="@string/you_can_call_911_text_your_emergency_contacts_or_broadcast_an_emergency_signal_to_nearby_volunteers_using_the_home_page"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toStartOf="@+id/itemCity8"
@@ -91,7 +91,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="30dp"
-                android:text="All the nearby volunteers are displayed in this section. If you register as voulunteer, you can see the nearby emergency requests and also respond to them."
+                android:text="@string/all_the_nearby_volunteers_are_displayed_in_this_section_if_you_register_as_voulunteer_you_can_see_the_nearby_emergency_requests_and_also_respond_to_them"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="1.0"
                 app:layout_constraintStart_toStartOf="@+id/itemCity12"
@@ -103,7 +103,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="2dp"
                 android:layout_marginEnd="30dp"
-                android:text="You can see your history of emergency requests here. Also you can cancel or mark a request resolved after the help is arrived."
+                android:text="@string/you_can_see_your_history_of_emergency_requests_here_also_you_can_cancel_or_mark_a_request_resolved_after_the_help_is_arrived"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="1.0"
                 app:layout_constraintStart_toStartOf="@+id/itemCity13"
@@ -115,7 +115,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="2dp"
                 android:layout_marginEnd="30dp"
-                android:text="This section provies your account management. You can edit your profile, set/update your emergency contacts, update your credentials, log out or deactivate your account from this section."
+                android:text="@string/this_section_provies_your_account_management_you_can_edit_your_profile_set_update_your_emergency_contacts_update_your_credentials_log_out_or_deactivate_your_account_from_this_section"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toStartOf="@+id/itemCity13"
@@ -126,7 +126,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
-                android:text="Map Page :"
+                android:text="@string/map_page"
                 android:textColor="@color/colorPrimary"
                 app:layout_constraintStart_toStartOf="@+id/itemCity8"
                 app:layout_constraintTop_toBottomOf="@+id/itemCity12" />
@@ -136,7 +136,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
-                android:text="Requests Page :"
+                android:text="@string/requests_page"
                 android:textColor="@color/colorPrimary"
                 app:layout_constraintStart_toStartOf="@+id/itemCity9"
                 app:layout_constraintTop_toBottomOf="@+id/itemCity13" />
@@ -146,7 +146,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
-                android:text="Profile Page :"
+                android:text="@string/profile_page"
                 android:textColor="@color/colorPrimary"
                 app:layout_constraintStart_toStartOf="@+id/itemCity10"
                 app:layout_constraintTop_toBottomOf="@+id/itemCity14" />
@@ -157,7 +157,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="12dp"
                 android:layout_marginTop="10dp"
-                android:text="About"
+                android:text="@string/about"
                 android:textColor="@color/colorPrimary"
                 android:textSize="20dp"
                 app:layout_constraintStart_toStartOf="parent"
@@ -169,7 +169,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="8dp"
-                android:text="Creators :  "
+                android:text="@string/creators"
                 android:textColor="@color/colorPrimary"
                 app:layout_constraintStart_toStartOf="@+id/textView18"
                 app:layout_constraintTop_toBottomOf="@+id/textView18" />
@@ -179,7 +179,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
-                android:text="Ayush Patel"
+                android:text="@string/ayush_patel"
                 app:layout_constraintStart_toStartOf="@+id/itemCity2"
                 app:layout_constraintTop_toBottomOf="@+id/itemCity2" />
 
@@ -188,7 +188,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
-                android:text="Help :  "
+                android:text="@string/help"
                 android:textColor="@color/colorPrimary"
                 android:textSize="20sp"
                 app:layout_constraintStart_toStartOf="@+id/textView18"
@@ -199,7 +199,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:text="Version :  "
+                android:text="@string/version_name"
                 android:textColor="@color/colorPrimary"
                 app:layout_constraintStart_toStartOf="@+id/textView19"
                 app:layout_constraintTop_toBottomOf="@+id/itemCity6" />

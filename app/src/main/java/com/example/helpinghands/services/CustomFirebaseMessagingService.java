@@ -1,6 +1,5 @@
 package com.example.helpinghands.services;
 
-import android.app.Activity;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -9,12 +8,10 @@ import android.content.Intent;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.NotificationCompat;
 
-import com.example.helpinghands.BGLocationListener;
 import com.example.helpinghands.MainActivity;
 import com.example.helpinghands.R;
 import com.example.helpinghands.User;
@@ -112,14 +109,14 @@ public class CustomFirebaseMessagingService extends FirebaseMessagingService {
                                 if(!jsonObject.getString("userId").equals(user.getUserid()) && user.getType() == 1) {
                                     LatLng latLng = new LatLng(Double.parseDouble(jsonObject.getString("latitude")), Double.parseDouble(jsonObject.getString("longitude")));
                                     if(distance(latLng, userLatLng) < 2.5){
-                                            notifyUser(getApplicationContext(), "Incoming Request", "Someone within your area needs your help", "Incoming Request Notification");
+                                            notifyUser(getApplicationContext(), getString(R.string.incoming_request), getString(R.string.someone_within_your_area_needs_your_help), "Incoming Request Notification");
                                     }
 //                                    Toast.makeText(CustomFirebaseMessagingService.this, "Message data payload: " + jsonObject.toString(), Toast.LENGTH_LONG).show();
                                 }
                                 break;
                             case "RequestAccept":
                                 myUser.setVolunteerId(jsonObject.getString("vid"));
-                                notifyUser(getApplicationContext(), "Help is coming", "A volunteer in your area has accepted your request", "Incoming Help Notification");
+                                notifyUser(getApplicationContext(), getString(R.string.help_is_coming), getString(R.string.a_volunteer_in_your_area_has_accepted_your_request), "Incoming Help Notification");
                         }
                     } catch (JSONException e) {
                         e.printStackTrace();

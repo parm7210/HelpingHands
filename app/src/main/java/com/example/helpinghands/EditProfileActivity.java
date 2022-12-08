@@ -45,50 +45,50 @@ public class EditProfileActivity extends AppCompatActivity {
         boolean validation = true;
         if(!firstName.getText().toString().matches("[a-z A-Z]+")){
             firstName.requestFocus();
-            firstName.setError("Please provide appropriate name");
+            firstName.setError(getString(R.string.please_provide_appropriate_name));
             validation = false;
         }
         if(!lastName.getText().toString().matches("[a-z A-Z]+")){
             lastName.requestFocus();
-            lastName.setError("Please provide appropriate name");
+            lastName.setError(getString(R.string.pease_provide_appropriate_name));
             validation = false;
         }
         if(addressLine.getText().toString().length() == 0){
             addressLine.requestFocus();
-            addressLine.setError("Field is required");
+            addressLine.setError(getString(R.string.field_is_required));
             validation = false;
         }
 
         if(city.getText().toString().length() == 0){
             city.requestFocus();
-            city.setError("Field is required");
+            city.setError(getString(R.string.field_is_required));
             validation = false;
         }
         if(state.getText().toString().length() == 0){
             state.requestFocus();
-            state.setError("Field is required");
+            state.setError(getString(R.string.field_is_required));
             validation = false;
         }
         if(country.getText().toString().length() == 0){
             country.requestFocus();
-            country.setError("Field is required");
+            country.setError(getString(R.string.field_is_required));
             validation = false;
         }
         if(postalCode.getText().toString().length() == 0){
             postalCode.requestFocus();
-            postalCode.setError("Field is required");
+            postalCode.setError(getString(R.string.field_is_required));
             validation = false;
         }
         if(!email.getText().toString().matches(
                 "^[a-zA-Z0-9._]+@[a-zA-Z]+?\\.[a-zA-Z]{2,5}$")){
             email.requestFocus();
-            email.setError("Please provide appropriate email-id");
+            email.setError(getString(R.string.please_provide_appropriate_email_id));
             validation = false;
         }
 
         if(!age.getText().toString().matches("[1-9][0-9]")){
             age.requestFocus();
-            age.setError("Please provide appropriate age");
+            age.setError(getString(R.string.please_provide_appropriate_age));
             validation = false;
         }
         return validation;
@@ -129,7 +129,7 @@ public class EditProfileActivity extends AppCompatActivity {
         lastName.setText(user.getLName());
         country.setText(user.getCountry());
         postalCode.setText(user.getPostalCode());
-        if(user.getGender().equals("Female")){gender2.setChecked(true);}
+        if(user.getGender().equals(getString(R.string.female))){gender2.setChecked(true);}
         else{gender.setChecked(true);}
         if(user.getType() == 1){type.setChecked(true);}
 
@@ -178,7 +178,7 @@ public class EditProfileActivity extends AppCompatActivity {
                     user.setType(Integer.parseInt(userType));
                     Toast.makeText(
                             this,
-                            "PROFILE UPDATED SUCCESSFULLY",
+                            getString(R.string.PROFILE_UPDATED_SUCCESSFULLY),
                             Toast.LENGTH_SHORT
                     ).show();
                     onBackPressed();

@@ -16,7 +16,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:background="#ff0844"
-            android:text="ACCEPT"
+            android:text="@string/accept"
             android:textColor="#fff"
             android:layout_margin="1dp" />
 

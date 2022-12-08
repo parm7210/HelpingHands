@@ -64,65 +64,65 @@ public class SignUpActivity extends AppCompatActivity {
         boolean validation = true;
         if(!firstName.getText().toString().matches("[a-z A-Z]+")){
             firstName.requestFocus();
-            firstName.setError("Please provide appropriate name");
+            firstName.setError(getString(R.string.Please_provide_appropriate_name));
             validation=false;
         }
         if(!lastName.getText().toString().matches("[a-z A-Z]+")){
             lastName.requestFocus();
-            lastName.setError("Please provide appropriate name");
+            lastName.setError(getString(R.string.Please_provide_appropriate_name));
             validation=false;
         }
         if(!password.getText().toString().matches("[a-zA-Z0-9]{5}[a-zA-Z0-9]+")){
             password.requestFocus();
-            password.setError("Password must be 6 characters long");
+            password.setError(getString(R.string.Password_must_be_6_characters_long));
             validation=false;
         }
         if(!phone.getText().toString().matches("[0-9]{10}")){
             phone.requestFocus();
-            phone.setError("Please provide 10 digit Mobile number");
+            phone.setError(getString(R.string.Please_provide_10_digit_Mobile_number));
             validation=false;
         }
         if(addressLine1.getText().toString().length() == 0){
             addressLine1.requestFocus();
-            addressLine1.setError("Field is required");
+            addressLine1.setError(getString(R.string.field_is_required));
             validation=false;
         }
 
         if(addressLIne2.getText().toString().length() == 0){
             addressLIne2.requestFocus();
-            addressLIne2.setError("Field is required");
+            addressLIne2.setError(getString(R.string.field_is_required));
             validation=false;
         }
         if(city.getText().toString().length() == 0){
             city.requestFocus();
-            city.setError("Field is required");
+            city.setError(getString(R.string.field_is_required));
             validation=false;
         }
         if(state.getText().toString().length() == 0){
             state.requestFocus();
-            state.setError("Field is required");
+            state.setError(getString(R.string.field_is_required));
             validation=false;
         }
         if(country.getText().toString().length() == 0){
             country.requestFocus();
-            country.setError("Field is required");
+            country.setError(getString(R.string.field_is_required));
             validation=false;
         }
         if(postalCode.getText().toString().length() == 0){
             postalCode.requestFocus();
-            postalCode.setError("Field is required");
+            postalCode.setError(getString(R.string.field_is_required));
             validation=false;
         }
 
         if(!email.getText().toString().matches("^\\w+@[a-zA-Z0-9_]+?\\.[a-zA-Z]{2,3}$")){
             email.requestFocus();
-            email.setError("Please provide appropriate email-id");
+            email.setError(getString(R.string.Please_provide_appropriate_email_id));
             validation=false;
         }
 
         if(!age.getText().toString().matches("[1-9][0-9]")){
             age.requestFocus();
-            age.setError("Please provide appropriate age");
+            age.setError(getString(R.string.Please_provide_appropriate_age));
             validation=false;
         }
         return validation;
@@ -138,12 +138,11 @@ public class SignUpActivity extends AppCompatActivity {
                                 final AlertDialog.Builder builder = new AlertDialog.Builder(
                                         SignUpActivity.this);
                                 builder.setCancelable(true);
-                                builder.setTitle("Account Already Exist");
+                                builder.setTitle(R.string.Account_Already_Exist);
                                 builder.setMessage(
-                                        "An account is already associated with given " +
-                                        "contact number.");
+                                        R.string.An_account_is_already_associated_with_given_contact_number);
                                 builder.setPositiveButton(
-                                        "Login", (DialogInterface dialog, int which) -> {
+                                        R.string.Login, (DialogInterface dialog, int which) -> {
                                         Intent intent = new Intent(
                                                 SignUpActivity.this,
                                                 LoginActivity.class);
@@ -151,7 +150,7 @@ public class SignUpActivity extends AppCompatActivity {
                                         overridePendingTransition(
                                                 R.anim.slide_in_left, R.anim.slide_out_right);
                                         });
-                                builder.setNegativeButton("cancel", (dialog, which) -> {
+                                builder.setNegativeButton(R.string.cancel, (dialog, which) -> {
                                         progressBar.setVisibility(View.INVISIBLE);
                                 });
                                 returnVal[0] = true;
@@ -165,7 +164,7 @@ public class SignUpActivity extends AppCompatActivity {
                         else{
                             Toast.makeText(
                                     getApplicationContext(),
-                                    "Error connecting to database",
+                                    R.string.Error_connecting_Database,
                                     Toast.LENGTH_SHORT).show();
                         }
                 });
@@ -257,7 +256,7 @@ public class SignUpActivity extends AppCompatActivity {
                                             }
                                             Toast.makeText(
                                                 getApplicationContext(),
-                                                "ACCOUNT CREATED SUCCESSFULLY",
+                                                R.string.ACCOUNT_CREATED_SUCCESSFULLY,
                                                 Toast.LENGTH_SHORT).show();
                                             User persistentUser = new User(
                                                     SignUpActivity.this);
@@ -303,7 +302,7 @@ public class SignUpActivity extends AppCompatActivity {
                                         progressBar.setVisibility(View.INVISIBLE);
                                         Toast.makeText(
                                             getApplicationContext(),
-                                            "FAIL TO CREATE ACCOUNT, TRY AGAIN AFTER SOME TIME",
+                                            R.string.FAIL_TO_CREATE_ACCOUNT,
                                             Toast.LENGTH_SHORT
                                         ).show();
                                     });

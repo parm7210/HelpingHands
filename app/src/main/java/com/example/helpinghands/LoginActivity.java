@@ -32,17 +32,17 @@ public class LoginActivity extends AppCompatActivity {
         boolean validation = true;
         if(!mobileNo.getText().toString().matches("[0-9]{10}")){
             mobileNo.requestFocus();
-            mobileNo.setError("Please provide 10 digit Mobile number");
+            mobileNo.setError(getString(R.string.Please_provide_10_digit_Mobile_number));
             validation = false;
         }
         if(mobileNo.getText().toString().length() == 0){
             mobileNo.requestFocus();
-            mobileNo.setError("Field can not be empty");
+            mobileNo.setError(getString(R.string.Field_can_not_be_empty));
             validation = false;
         }
         if(password.getText().toString().length() == 0){
             password.requestFocus();
-            password.setError("Field can not be empty");
+            password.setError(getString(R.string.Field_can_not_be_empty));
             validation = false;
         }
         return validation;
@@ -143,7 +143,7 @@ public class LoginActivity extends AppCompatActivity {
                                             Log.d("status", document.getId() + " => " + document.getData());
 
                                             if (password.getText().toString().equals(document.get("password"))) {
-                                                Toast.makeText(getApplicationContext(), "Login Successfully", Toast.LENGTH_SHORT).show();
+                                                Toast.makeText(getApplicationContext(), R.string.Login_Successfully, Toast.LENGTH_SHORT).show();
                                                 setPersistentUser(document);
                                                 progressBar.setVisibility(View.INVISIBLE);
                                                 Intent in = new Intent(LoginActivity.this, MainActivity.class);
@@ -151,12 +151,12 @@ public class LoginActivity extends AppCompatActivity {
                                                 overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
                                             } else {
                                                 progressBar.setVisibility(View.INVISIBLE);
-                                                Toast.makeText(getApplicationContext(), "Invalid Login Credentials", Toast.LENGTH_SHORT).show();
+                                                Toast.makeText(getApplicationContext(), R.string.Invalid_Login_Credentials, Toast.LENGTH_SHORT).show();
                                             }
                                         }
                                     }
                                 } else {
-                                    Toast.makeText(this, "Error getting documents: " + task.getException().toString(), Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(this, getString(R.string.Error_getting_documents) + task.getException().toString(), Toast.LENGTH_SHORT).show();
                                 }
                             });
                 }
